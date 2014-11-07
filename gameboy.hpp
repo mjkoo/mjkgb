@@ -14,7 +14,6 @@ public:
       : cpu_()
     { }
 
-
     template<typename T>
     typename accessor<T>::value_type get(T operand) const
     {
@@ -92,7 +91,7 @@ struct accessor<BytePointer<T>> {
 
     value_type get(const Gameboy &gb, BytePointer<T> ptr) const
     {
-        return 2;
+        return sizeof(typename accessor<T>::value_type) == 1 ? 0xff02 : 2;
     }
 
     void set(Gameboy &gb, BytePointer<T> ptr, value_type value) const
@@ -107,7 +106,7 @@ struct accessor<WordPointer<T>> {
 
     value_type get(const Gameboy &gb, WordPointer<T> ptr) const
     {
-        return 3;
+        return sizeof(typename accessor<T>::value_type) == 1 ? 0xff03 : 3;
     }
 
     void set(Gameboy &gb, WordPointer<T> ptr, value_type value) const
@@ -125,10 +124,7 @@ struct accessor<Immediate<T>> {
         return 4;
     }
 
-    void set(Gameboy &gb, Immediate<T> imm, value_type value) const
-    {
-
-    }
+    void set(Gameboy &gb, Immediate<T> imm, value_type value) const;
 };
 
 #endif /* GAMEBOY_HPP_ */
