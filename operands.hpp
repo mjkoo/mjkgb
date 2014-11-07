@@ -19,14 +19,16 @@ template<typename T>
 struct BytePointer {
     T value;
     explicit BytePointer(T value)
-      : value(value) { }
+      : value(value)
+    { }
 };
 
 template<typename T>
 struct WordPointer {
     T value;
     explicit WordPointer(T value)
-      : value(value) { }
+      : value(value)
+    { }
 };
 
 template<typename T>
@@ -35,16 +37,9 @@ struct Immediate {
             "Non-integral immediate value");
     T value;
     explicit Immediate(T value)
-      : value(value) { }
+      : value(value)
+    { }
 };
-
-template<typename T> struct operand_type;
-template<> struct operand_type<ByteRegister> { typedef uint8_t type; };
-template<> struct operand_type<WordRegister> { typedef uint16_t type; };
-template<> struct operand_type<ConditionCode> { typedef bool type; };
-template<typename T> struct operand_type<BytePointer<T>> { typedef uint8_t type; };
-template<typename T> struct operand_type<WordPointer<T>> { typedef uint16_t type; };
-template<typename T> struct operand_type<Immediate<T>> { typedef T type; };
 
 #endif /* OPERANDS_HPP_ */
 

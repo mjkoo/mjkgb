@@ -4,69 +4,130 @@
 #include <cstdint>
 
 #include "operands.hpp"
+#include "cpu.hpp"
 
-template<typename T> struct get_;
+template<typename T> struct accessor;
 
 class Gameboy {
 public:
-    Gameboy() {
-        regs_[0] = 0xfe;
+    Gameboy()
+      : cpu_()
+    { }
+
+
+    template<typename T>
+    typename accessor<T>::value_type get(T operand) const
+    {
+        return accessor<T>().get(*this, operand);
     }
 
     template<typename T>
-    typename operand_type<T>::type get(T operand)
+    void set(T operand, typename accessor<T>::value_type value)
     {
-        return get_<T>()(*this, operand);
+        accessor<T>().set(*this, operand, value);
     }
 
-    uint8_t regs_[8];
+    Cpu &cpu()
+    {
+        return cpu_;
+    }
+
+    const Cpu &cpu() const
+    {
+        return cpu_;
+    }
+
+private:
+    Cpu cpu_;
 };
 
 template<>
-struct get_<ByteRegister> {
-    uint8_t operator()(const Gameboy &gb, ByteRegister reg)
+struct accessor<ByteRegister> {
+    typedef uint8_t value_type;
+
+    value_type get(const Gameboy &gb, ByteRegister reg) const
     {
-        return gb.regs_[0];
+        return gb.cpu().registers[0];
+    }
+
+    void set(Gameboy &gb, ByteRegister reg, value_type value) const
+    {
+
     }
 };
 
 template<>
-struct get_<WordRegister> {
-    uint16_t operator()(const Gameboy &gb, WordRegister reg)
+struct accessor<WordRegister> {
+    typedef uint16_t value_type;
+
+    value_type get(const Gameboy &gb, WordRegister reg) const
     {
         return 1;
     }
+
+    void set(Gameboy &gb, WordRegister reg, value_type value) const
+    {
+
+    }
 };
 
 template<>
-struct get_<ConditionCode> {
-    bool operator()(const Gameboy &gb, ConditionCode cc)
+struct accessor<ConditionCode> {
+    typedef bool value_type;
+
+    value_type get(const Gameboy &gb, ConditionCode cc) const
     {
         return false;
     }
+
+    void set(Gameboy &gb, ConditionCode cc, value_type value) const
+    {
+
+    }
 };
 
 template<typename T>
-struct get_<BytePointer<T>> {
-    uint8_t operator()(const Gameboy &gb, BytePointer<T> ptr)
+struct accessor<BytePointer<T>> {
+    typedef uint8_t value_type;
+
+    value_type get(const Gameboy &gb, BytePointer<T> ptr) const
     {
         return 2;
     }
-};
 
-template<typename T>
-struct get_<WordPointer<T>> {
-    uint16_t operator()(const Gameboy &gb, WordPointer<T> ptr)
+    void set(Gameboy &gb, BytePointer<T> ptr, value_type value) const
     {
-        return 3;
+
     }
 };
 
 template<typename T>
-struct get_<Immediate<T>> {
-    T operator()(const Gameboy &gb, Immediate<T> imm)
+struct accessor<WordPointer<T>> {
+    typedef uint16_t value_type;
+
+    value_type get(const Gameboy &gb, WordPointer<T> ptr) const
+    {
+        return 3;
+    }
+
+    void set(Gameboy &gb, WordPointer<T> ptr, value_type value) const
+    {
+
+    }
+};
+
+template<typename T>
+struct accessor<Immediate<T>> {
+    typedef T value_type;
+
+    value_type get(const Gameboy &gb, Immediate<T> imm) const
     {
         return 4;
+    }
+
+    void set(Gameboy &gb, Immediate<T> imm, value_type value) const
+    {
+
     }
 };
 
