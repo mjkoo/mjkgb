@@ -1,5 +1,5 @@
-#ifndef GB_Z80_HPP_
-#define GB_Z80_HPP_
+#ifndef GAMEBOY_HPP_
+#define GAMEBOY_HPP_
 
 #include <cstdint>
 
@@ -7,9 +7,9 @@
 
 template<typename T> struct get_;
 
-class GbZ80 {
+class Gameboy {
 public:
-    GbZ80() {
+    Gameboy() {
         regs_[0] = 0xfe;
     }
 
@@ -24,15 +24,15 @@ public:
 
 template<>
 struct get_<ByteRegister> {
-    uint8_t operator()(const GbZ80 &cpu, ByteRegister reg)
+    uint8_t operator()(const Gameboy &gb, ByteRegister reg)
     {
-        return cpu.regs_[0];
+        return gb.regs_[0];
     }
 };
 
 template<>
 struct get_<WordRegister> {
-    uint16_t operator()(const GbZ80 &cpu, WordRegister reg)
+    uint16_t operator()(const Gameboy &gb, WordRegister reg)
     {
         return 1;
     }
@@ -40,7 +40,7 @@ struct get_<WordRegister> {
 
 template<>
 struct get_<ConditionCode> {
-    bool operator()(const GbZ80 &cpu, ConditionCode cc)
+    bool operator()(const Gameboy &gb, ConditionCode cc)
     {
         return false;
     }
@@ -48,7 +48,7 @@ struct get_<ConditionCode> {
 
 template<typename T>
 struct get_<BytePointer<T>> {
-    uint8_t operator()(const GbZ80 &cpu, BytePointer<T> ptr)
+    uint8_t operator()(const Gameboy &gb, BytePointer<T> ptr)
     {
         return 2;
     }
@@ -56,7 +56,7 @@ struct get_<BytePointer<T>> {
 
 template<typename T>
 struct get_<WordPointer<T>> {
-    uint16_t operator()(const GbZ80 &cpu, WordPointer<T> ptr)
+    uint16_t operator()(const Gameboy &gb, WordPointer<T> ptr)
     {
         return 3;
     }
@@ -64,11 +64,11 @@ struct get_<WordPointer<T>> {
 
 template<typename T>
 struct get_<Immediate<T>> {
-    T operator()(const GbZ80 &cpu, Immediate<T> imm)
+    T operator()(const Gameboy &gb, Immediate<T> imm)
     {
         return 4;
     }
 };
 
-#endif /* GB_Z80_HPP_ */
+#endif /* GAMEBOY_HPP_ */
 

@@ -17,25 +17,25 @@ enum class ConditionCode {
 
 template<typename T>
 struct BytePointer {
-    T value_;
+    T value;
     explicit BytePointer(T value)
-      : value_(value) { }
+      : value(value) { }
 };
 
 template<typename T>
 struct WordPointer {
-    T value_;
+    T value;
     explicit WordPointer(T value)
-      : value_(value) { }
+      : value(value) { }
 };
 
 template<typename T>
 struct Immediate {
     static_assert(std::is_integral<T>::value,
             "Non-integral immediate value");
-    T value_;
+    T value;
     explicit Immediate(T value)
-      : value_(value) { }
+      : value(value) { }
 };
 
 template<typename T> struct operand_type;
