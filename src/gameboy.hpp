@@ -3,7 +3,6 @@
 
 #include <cstdint>
 
-#include "operands.hpp"
 #include "cpu.hpp"
 
 template<typename T> struct accessor;
@@ -46,12 +45,12 @@ struct accessor<ByteRegister> {
 
     value_type get(const Gameboy &gb, ByteRegister reg) const
     {
-        return gb.cpu().registers[0];
+        return gb.cpu().get(reg);
     }
 
     void set(Gameboy &gb, ByteRegister reg, value_type value) const
     {
-
+        gb.cpu().set(reg, value);
     }
 };
 
@@ -61,12 +60,12 @@ struct accessor<WordRegister> {
 
     value_type get(const Gameboy &gb, WordRegister reg) const
     {
-        return 1;
+        return gb.cpu().get(reg);
     }
 
     void set(Gameboy &gb, WordRegister reg, value_type value) const
     {
-
+        return gb.cpu().set(reg, value);
     }
 };
 
@@ -76,12 +75,20 @@ struct accessor<ConditionCode> {
 
     value_type get(const Gameboy &gb, ConditionCode cc) const
     {
-        return false;
+        uint8_t flags = gb.cpu().get(ByteRegister::F);
+        return (flags & (1 << (static_cast<int>(cc) + 4))) != 0;
     }
 
     void set(Gameboy &gb, ConditionCode cc, value_type value) const
     {
+        uint8_t flags = gb.cpu().get(ByteRegister::F);
 
+        if (value)
+            flags |= (1 << (static_cast<int>(cc) + 4));
+        else
+            flags &= ~(1 << (static_cast<int>(cc) + 4));
+
+        gb.cpu().set(ByteRegister::F, flags);
     }
 };
 
@@ -121,7 +128,7 @@ struct accessor<Immediate<T>> {
 
     value_type get(const Gameboy &gb, Immediate<T> imm) const
     {
-        return 4;
+        return imm.value;
     }
 
     void set(Gameboy &gb, Immediate<T> imm, value_type value) const;
