@@ -3,6 +3,7 @@
 
 #include "mjkgb.hpp"
 #include "cpu.hpp"
+#include "mmu.hpp"
 
 using namespace std;
 
@@ -17,7 +18,8 @@ template<typename T> struct accessor;
 class GameboyImpl {
 public:
     GameboyImpl()
-      : cpu_()
+      : cpu_(),
+        mmu_()
     { }
 
     template<typename T>
@@ -34,11 +36,12 @@ public:
 
     void load(const string &filename)
     {
-
+        mmu_.load(filename);
     }
 
 private:
     Cpu cpu_;
+    Mmu mmu_;
 
     template<typename T> friend struct accessor;
 };
