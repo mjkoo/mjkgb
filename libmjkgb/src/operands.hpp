@@ -15,7 +15,7 @@ enum class ConditionCode {
     Z, H, N, C
 };
 
-template<typename T, int offset = 0>
+template<typename T, bool inc = false>
 struct BytePointer {
     T value;
     explicit BytePointer(T value)
@@ -23,7 +23,7 @@ struct BytePointer {
     { }
 };
 
-template<typename T, int offset = 0>
+template<typename T, bool inc = false>
 struct WordPointer {
     T value;
     explicit WordPointer(T value)

@@ -46,6 +46,13 @@ private:
     template<typename T> friend struct accessor;
 };
 
+}
+
+/* Accessor functors contained in separate header. */
+#include "accessors.hpp"
+
+namespace mjkgb {
+
 class Gameboy::impl : public GameboyImpl { };
 
 Gameboy::Gameboy()
@@ -66,7 +73,4 @@ void Gameboy::load(const string &filename)
 }
 
 }
-
-/* Accessor functors contained in separate header. */
-#include "accessors.hpp"
 

@@ -1,6 +1,8 @@
 #ifndef ACCESSOR_HPP_
 #define ACCESSOR_HPP_
 
+#include <type_traits>
+
 namespace mjkgb {
 
 template<>
@@ -56,33 +58,32 @@ struct accessor<ConditionCode> {
     }
 };
 
-template<typename T, int offset>
-struct accessor<BytePointer<T, offset>> {
+template<typename T, bool inc>
+struct accessor<BytePointer<T, inc>> {
     typedef uint8_t value_type;
 
-    value_type get(const GameboyImpl &gb, BytePointer<T, offset> ptr) const
+    value_type get(const GameboyImpl &gb, BytePointer<T, inc> ptr) const
     {
         return sizeof(typename accessor<T>::value_type) == 1 ? 0xff : 2;
     }
 
-    void set(GameboyImpl &gb, BytePointer<T, offset> ptr, value_type value) const
+    void set(GameboyImpl &gb, BytePointer<T, inc> ptr, value_type value) const
     {
-
     }
 };
 
-template<typename T, int offset>
-struct accessor<WordPointer<T, offset>> {
+template<typename T, bool inc>
+struct accessor<WordPointer<T, inc>> {
     typedef uint16_t value_type;
 
-    value_type get(const GameboyImpl &gb, WordPointer<T, offset> ptr) const
+    value_type get(const GameboyImpl &gb, WordPointer<T, inc> ptr) const
     {
         return sizeof(typename accessor<T>::value_type) == 1 ? 0xff03 : 3;
     }
 
-    void set(GameboyImpl &gb, WordPointer<T, offset> ptr, value_type value) const
+    void set(GameboyImpl &gb, WordPointer<T, inc> ptr, value_type value) const
     {
-
+        static_assert(!is_same<ByteImmediate, decltype(ptr)>::value, "");
     }
 };
 
@@ -90,26 +91,26 @@ template<>
 struct accessor<ByteImmediate> {
     typedef uint8_t value_type;
 
-    value_type get(const GameboyImpl &gb, ByteImmediate imm) const
+    value_type get(const GameboyImpl &gb, ByteImmediate) const
     {
-        auto ptr = BytePointer<WordRegister, 1>(WordRegister::PC);
-        return accessor<decltype(ptr)>().get(gb, ptr);
+        BytePointer<WordRegister, true> imm_ptr(WordRegister::PC);
+        return accessor<decltype(imm_ptr)>().get(gb, imm_ptr);
     }
 
-    void set(GameboyImpl &gb, ByteImmediate imm, value_type value) const;
+    void set(GameboyImpl &, ByteImmediate, value_type) const;
 };
 
 template<>
 struct accessor<WordImmediate> {
     typedef uint16_t value_type;
 
-    value_type get(const GameboyImpl &gb, WordImmediate imm) const
+    value_type get(const GameboyImpl &gb, WordImmediate) const
     {
-        auto ptr = WordPointer<WordRegister, 1>(WordRegister::PC);
-        return accessor<decltype(ptr)>().get(gb, ptr);
+        WordPointer<WordRegister, true> imm_ptr(WordRegister::PC);
+        return accessor<decltype(imm_ptr)>().get(gb, imm_ptr);
     }
 
-    void set(GameboyImpl &gb, WordImmediate imm, value_type value) const;
+    void set(GameboyImpl &, WordImmediate, value_type) const;
 };
 
 }
