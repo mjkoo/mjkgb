@@ -6,6 +6,8 @@
 
 #include "operands.hpp"
 
+namespace mjkgb {
+
 class Cpu {
 public:
     Cpu();
@@ -19,6 +21,8 @@ public:
 private:
     std::array<uint8_t, 2 * (static_cast<size_t>(WordRegister::SP) + 1)> registers_;
 };
+
+}
 
 #endif /* CPU_HPP_ */
 

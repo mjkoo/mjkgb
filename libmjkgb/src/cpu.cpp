@@ -1,5 +1,7 @@
 #include "cpu.hpp"
 
+namespace mjkgb {
+
 Cpu::Cpu()
   : registers_()
 { }
@@ -26,6 +28,8 @@ Cpu::set(ByteRegister reg, uint8_t value)
 void
 Cpu::set(WordRegister reg, uint16_t value)
 {
+
+}
 
 }
 

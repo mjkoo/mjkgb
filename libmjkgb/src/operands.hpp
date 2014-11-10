@@ -1,6 +1,8 @@
 #ifndef OPERANDS_HPP_
 #define OPERANDS_HPP_
 
+namespace mjkgb {
+
 enum class ByteRegister {
     A, F, B, C, D, E, H, L
 };
@@ -31,6 +33,8 @@ struct WordPointer {
 
 struct ByteImmediate { };
 struct WordImmediate { };
+
+}
 
 #endif /* OPERANDS_HPP_ */
 
