@@ -45,25 +45,11 @@ private:
 
 class Gameboy::impl : public GameboyImpl { };
 
-Gameboy::Gameboy()
-  : pimpl_(new Gameboy::impl)
-{ }
-
-Gameboy::Gameboy(const string &filename)
-  : Gameboy()
-{
-    load(filename);
-}
-
-Gameboy::~Gameboy() = default;
-
-void Gameboy::load(const string &filename)
-{
-    pimpl_->load(filename);
-}
-
 }
 
 /* Accessor functors contained in separate header. */
 #include "accessors.hpp"
+
+/* Gameboy pimpl wrappers contained in separate header. */
+#include "gameboy.hpp"
 
