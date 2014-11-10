@@ -26,7 +26,7 @@ endif ()
 add_subdirectory(libmjkgb)
 add_subdirectory(tests)
 
-include_directories(./libmjkgb/src)
+include_directories(./libmjkgb/include)
 add_executable(mjkgb
     ./src/main.cpp
 )

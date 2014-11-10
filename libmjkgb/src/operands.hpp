@@ -1,8 +1,6 @@
 #ifndef OPERANDS_HPP_
 #define OPERANDS_HPP_
 
-#include <type_traits>
-
 enum class ByteRegister {
     A, F, B, C, D, E, H, L
 };
@@ -15,7 +13,7 @@ enum class ConditionCode {
     Z, H, N, C
 };
 
-template<typename T>
+template<typename T, int offset = 0>
 struct BytePointer {
     T value;
     explicit BytePointer(T value)
@@ -23,7 +21,7 @@ struct BytePointer {
     { }
 };
 
-template<typename T>
+template<typename T, int offset = 0>
 struct WordPointer {
     T value;
     explicit WordPointer(T value)
@@ -31,15 +29,8 @@ struct WordPointer {
     { }
 };
 
-template<typename T>
-struct Immediate {
-    static_assert(std::is_integral<T>::value,
-            "Non-integral immediate value");
-    T value;
-    explicit Immediate(T value)
-      : value(value)
-    { }
-};
+struct ByteImmediate { };
+struct WordImmediate { };
 
 #endif /* OPERANDS_HPP_ */
 
