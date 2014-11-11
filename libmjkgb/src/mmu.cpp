@@ -12,12 +12,12 @@ Mmu::Mmu()
 
 uint8_t Mmu::get(uint16_t address) const
 {
-    return 0;
+    return memory_[address];
 }
 
 void Mmu::set(uint16_t address, uint8_t value)
 {
-
+    memory_[address] = value;
 }
 
 void Mmu::load(const std::string &filename)

@@ -24,6 +24,7 @@ private:
     static constexpr int num_registers =
         2 * (static_cast<size_t>(WordRegister::SP) + 1);
 
+    unsigned long cycles_;
     std::array<uint8_t, num_registers> registers_;
 };
 

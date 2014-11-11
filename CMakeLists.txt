@@ -13,6 +13,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     set(EXTRA_CXX_FLAGS
         "-Werror"
         "-Weverything"
+        "-Wno-padded"
         "-Wno-shadow"
         "-Wno-unused-parameter"
         "-Wno-global-constructors"
