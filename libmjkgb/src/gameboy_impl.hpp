@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <string>
 
+#include "mjkgb.hpp"
 #include "cpu.hpp"
 #include "mmu.hpp"
 
@@ -34,10 +35,7 @@ public:
         accessor<T>().set(*this, operand, value);
     }
 
-    void load(const std::string &filename)
-    {
-        mmu_.load(filename);
-    }
+    void load(const std::string &filename);
 
 private:
     Cpu cpu_;
