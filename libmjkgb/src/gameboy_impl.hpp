@@ -7,6 +7,7 @@
 #include "mjkgb.hpp"
 #include "cpu.hpp"
 #include "mmu.hpp"
+#include "operands.hpp"
 
 namespace mjkgb {
 
@@ -102,51 +103,73 @@ struct accessor<ConditionCode> {
     }
 };
 
-template<typename T, bool inc>
+template<typename T, int inc>
 struct accessor<BytePointer<T, inc>> {
     typedef uint8_t value_type;
 
     value_type get(GameboyImpl &gb, BytePointer<T, inc> ptr) const
     {
-        uint16_t address = sizeof(typename accessor<T>::value_type) == 1 ? 0xff00 : 0;
+        typedef typename accessor<T>::value_type operand_type;
+        uint16_t address = sizeof(operand_type) == 1 ? 0xff00 : 0;
         address |= gb.get(ptr.value);
+
         auto ret = gb.mmu_.get(address);
         gb.cpu_.tick();
+
+        if (inc)
+            gb.set(ptr.value, static_cast<operand_type>(gb.get(ptr.value) + inc));
+
         return ret;
     }
 
     void set(GameboyImpl &gb, BytePointer<T, inc> ptr, value_type value) const
     {
+        typedef typename accessor<T>::value_type operand_type;
         uint16_t address = sizeof(typename accessor<T>::value_type) == 1 ? 0xff00 : 0;
         address |= gb.get(ptr.value);
+
         gb.mmu_.set(address, value);
         gb.cpu_.tick();
+
+        if (inc)
+            gb.set(ptr.value, static_cast<operand_type>(gb.get(ptr.value) + inc));
     }
 };
 
-template<typename T, bool inc>
+template<typename T, int inc>
 struct accessor<WordPointer<T, inc>> {
     typedef uint16_t value_type;
 
     value_type get(GameboyImpl &gb, WordPointer<T, inc> ptr) const
     {
+        typedef typename accessor<T>::value_type operand_type;
         uint16_t address = sizeof(typename accessor<T>::value_type) == 1 ? 0xff00 : 0;
         address |= gb.get(ptr.value);
-        auto ret = static_cast<value_type>(gb.mmu_.get(address) << 8);
+
+        auto ret = static_cast<value_type>(gb.mmu_.get(address));
         gb.cpu_.tick();
-        ret |= gb.mmu_.get(address + 1);
+        ret |= (gb.mmu_.get(address + 1) << 8);
         gb.cpu_.tick();
+
+        if (inc)
+            gb.set(ptr.value, static_cast<operand_type>(gb.get(ptr.value) + inc));
+
         return ret;
     }
 
     void set(GameboyImpl &gb, WordPointer<T, inc> ptr, value_type value) const
     {
+        typedef typename accessor<T>::value_type operand_type;
         uint16_t address = sizeof(typename accessor<T>::value_type) == 1 ? 0xff00 : 0;
         address |= gb.get(ptr.value);
-        gb.mmu_.set(address, value >> 8 & 0xff);
+
+        gb.mmu_.set(address, value & 0xff);
         gb.cpu_.tick();
-        gb.mmu_.set(address + 1, value & 0xff);
+        gb.mmu_.set(address + 1, (value >> 8) & 0xff);
         gb.cpu_.tick();
+
+        if (inc)
+            gb.set(ptr.value, static_cast<operand_type>(gb.get(ptr.value) + inc));
     }
 };
 
@@ -156,9 +179,8 @@ struct accessor<ByteImmediate> {
 
     value_type get(GameboyImpl &gb, ByteImmediate) const
     {
-        auto imm_ptr = BytePointer<WordRegister, true>(WordRegister::PC);
+        auto imm_ptr = BytePointer<WordRegister, sizeof(value_type)>(WordRegister::PC);
         auto ret = accessor<decltype(imm_ptr)>().get(gb, imm_ptr);
-        gb.cpu_.set(WordRegister::PC, gb.cpu_.get(WordRegister::PC) + sizeof(value_type));
         return ret;
     }
 
@@ -171,9 +193,8 @@ struct accessor<WordImmediate> {
 
     value_type get(GameboyImpl &gb, WordImmediate) const
     {
-        auto imm_ptr = WordPointer<WordRegister, true>(WordRegister::PC);
+        auto imm_ptr = WordPointer<WordRegister, sizeof(value_type)>(WordRegister::PC);
         auto ret = accessor<decltype(imm_ptr)>().get(gb, imm_ptr);
-        gb.cpu_.set(WordRegister::PC, gb.cpu_.get(WordRegister::PC) + sizeof(value_type));
         return ret;
     }
 
