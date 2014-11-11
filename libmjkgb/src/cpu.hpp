@@ -18,8 +18,13 @@ public:
     void set(ByteRegister reg, uint8_t value);
     void set(WordRegister reg, uint16_t value);
 
+    void tick();
+
 private:
-    std::array<uint8_t, 2 * (static_cast<size_t>(WordRegister::SP) + 1)> registers_;
+    static constexpr int num_registers =
+        2 * (static_cast<size_t>(WordRegister::SP) + 1);
+
+    std::array<uint8_t, num_registers> registers_;
 };
 
 }

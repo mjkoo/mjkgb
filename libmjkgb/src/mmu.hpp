@@ -17,7 +17,9 @@ public:
     void load(const std::string &filename);
 
 private:
-    std::array<uint8_t, (1 << 16)> memory_;
+    static constexpr int memory_size = 1 << 16;
+
+    std::array<uint8_t, memory_size> memory_;
 };
 
 }

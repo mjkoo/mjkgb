@@ -13,11 +13,14 @@ enum class Register {
 
 class Gameboy {
 public:
+    static constexpr int xres = 160;
+    static constexpr int yres = 144;
+
     Gameboy();
     explicit Gameboy(const std::string &filename);
     ~Gameboy();
 
-    typedef std::function<void(const std::array<uint32_t, 160 * 144> &)> vsync_cb;
+    typedef std::function<void(const std::array<uint8_t, 3 * xres * yres> &)> vsync_cb;
     void setVsyncCallback(vsync_cb callback);
 
     void load(const std::string &filename);
