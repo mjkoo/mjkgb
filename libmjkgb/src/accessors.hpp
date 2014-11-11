@@ -64,11 +64,16 @@ struct accessor<BytePointer<T, inc>> {
 
     value_type get(const GameboyImpl &gb, BytePointer<T, inc> ptr) const
     {
-        return sizeof(typename accessor<T>::value_type) == 1 ? 0xff : 2;
+        uint16_t address = sizeof(typename accessor<T>::value_type) == 1 ? 0xff00 : 0;
+        address |= gb.get(ptr.value);
+        return gb.mmu_.getByte(address);
     }
 
     void set(GameboyImpl &gb, BytePointer<T, inc> ptr, value_type value) const
     {
+        uint16_t address = sizeof(typename accessor<T>::value_type) == 1 ? 0xff00 : 0;
+        address |= gb.get(ptr.value);
+        gb.mmu_.setByte(address, value);
     }
 };
 
@@ -78,12 +83,16 @@ struct accessor<WordPointer<T, inc>> {
 
     value_type get(const GameboyImpl &gb, WordPointer<T, inc> ptr) const
     {
-        return sizeof(typename accessor<T>::value_type) == 1 ? 0xff03 : 3;
+        uint16_t address = sizeof(typename accessor<T>::value_type) == 1 ? 0xff00 : 0;
+        address |= gb.get(ptr.value);
+        return gb.mmu_.getWord(address);
     }
 
     void set(GameboyImpl &gb, WordPointer<T, inc> ptr, value_type value) const
     {
-        static_assert(!is_same<ByteImmediate, decltype(ptr)>::value, "");
+        uint16_t address = sizeof(typename accessor<T>::value_type) == 1 ? 0xff00 : 0;
+        address |= gb.get(ptr.value);
+        gb.mmu_.setWord(address, value);
     }
 };
 
