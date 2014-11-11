@@ -10,22 +10,12 @@ Mmu::Mmu()
   : memory_()
 { }
 
-uint8_t Mmu::getByte(uint16_t address) const
+uint8_t Mmu::get(uint16_t address) const
 {
     return 0;
 }
 
-uint16_t Mmu::getWord(uint16_t address) const
-{
-    return 0;
-}
-
-void Mmu::setByte(uint16_t address, uint8_t value)
-{
-
-}
-
-void Mmu::setWord(uint16_t address, uint16_t value)
+void Mmu::set(uint16_t address, uint8_t value)
 {
 
 }

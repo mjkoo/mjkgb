@@ -112,14 +112,14 @@ struct accessor<BytePointer<T, inc>> {
     {
         uint16_t address = sizeof(typename accessor<T>::value_type) == 1 ? 0xff00 : 0;
         address |= gb.get(ptr.value);
-        return gb.mmu_.getByte(address);
+        return gb.mmu_.get(address);
     }
 
     void set(GameboyImpl &gb, BytePointer<T, inc> ptr, value_type value) const
     {
         uint16_t address = sizeof(typename accessor<T>::value_type) == 1 ? 0xff00 : 0;
         address |= gb.get(ptr.value);
-        gb.mmu_.setByte(address, value);
+        gb.mmu_.set(address, value);
     }
 };
 
@@ -131,14 +131,15 @@ struct accessor<WordPointer<T, inc>> {
     {
         uint16_t address = sizeof(typename accessor<T>::value_type) == 1 ? 0xff00 : 0;
         address |= gb.get(ptr.value);
-        return gb.mmu_.getWord(address);
+        return static_cast<value_type>(gb.mmu_.get(address) << 8 | gb.mmu_.get(address + 1));
     }
 
     void set(GameboyImpl &gb, WordPointer<T, inc> ptr, value_type value) const
     {
         uint16_t address = sizeof(typename accessor<T>::value_type) == 1 ? 0xff00 : 0;
         address |= gb.get(ptr.value);
-        gb.mmu_.setWord(address, value);
+        gb.mmu_.set(address, value >> 8 & 0xff);
+        gb.mmu_.set(address + 1, value & 0xff);
     }
 };
 

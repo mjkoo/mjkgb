@@ -11,11 +11,8 @@ class Mmu {
 public:
     Mmu();
 
-    uint8_t getByte(uint16_t address) const;
-    uint16_t getWord(uint16_t address) const;
-
-    void setByte(uint16_t address, uint8_t value);
-    void setWord(uint16_t address, uint16_t value);
+    uint8_t get(uint16_t address) const;
+    void set(uint16_t address, uint8_t value);
 
     void load(const std::string &filename);
 
