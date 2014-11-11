@@ -32,17 +32,25 @@ TEST_F(AccessorsTest, WordRegister) {
 
     gb.set(WordRegister::AF, 0xdead);
     EXPECT_EQ(0xdead, gb.get(WordRegister::AF));
+    EXPECT_EQ(0xde, gb.get(ByteRegister::A));
+    EXPECT_EQ(0xad, gb.get(ByteRegister::F));
 
     gb.set(WordRegister::AF, gb.get(WordRegister::AF) + 1);
     EXPECT_EQ(0xdeae, gb.get(WordRegister::AF));
+    EXPECT_EQ(0xde, gb.get(ByteRegister::A));
+    EXPECT_EQ(0xae, gb.get(ByteRegister::F));
 
     EXPECT_EQ(0, gb.get(WordRegister::DE));
 
     gb.set(WordRegister::DE, 0xbeef);
     EXPECT_EQ(0xbeef, gb.get(WordRegister::DE));
+    EXPECT_EQ(0xbe, gb.get(ByteRegister::D));
+    EXPECT_EQ(0xef, gb.get(ByteRegister::E));
 
     gb.set(WordRegister::DE, gb.get(WordRegister::DE) + 1);
     EXPECT_EQ(0xbef0, gb.get(WordRegister::DE));
+    EXPECT_EQ(0xbe, gb.get(ByteRegister::D));
+    EXPECT_EQ(0xf0, gb.get(ByteRegister::E));
 }
 
 TEST_F(AccessorsTest, ConditionCode) {

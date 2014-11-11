@@ -1,4 +1,4 @@
 mjkgb
 =====
-A C++ Gameboy emulator.
+A C++ Gameboy emulator. More detailed readme TODO.
 
