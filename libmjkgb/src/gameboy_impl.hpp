@@ -19,10 +19,7 @@ template<typename T> struct accessor;
  */
 class GameboyImpl {
 public:
-    GameboyImpl()
-      : cpu_(),
-        mmu_()
-    { }
+    GameboyImpl();
 
     template<typename T>
     typename accessor<T>::value_type get(T operand)

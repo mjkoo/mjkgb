@@ -4,6 +4,8 @@
 
 using namespace mjkgb;
 
+namespace {
+
 class AccessorsTest : public testing::Test {
 protected:
     GameboyImpl gb;
@@ -167,5 +169,7 @@ TEST_F(AccessorsTest, WordImmediate) {
     gb.set(WordPointer<WordRegister>(WordRegister::HL), 0xdead);
     EXPECT_EQ(0xdead, gb.get(WordImmediate()));
     EXPECT_EQ(4, gb.get(WordRegister::PC));
+}
+
 }
 
