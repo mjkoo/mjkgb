@@ -16,7 +16,7 @@ public:
     uint16_t get(WordRegister reg) const;
 
     void set(ByteRegister reg, uint8_t value);
-    void set(WordRegister reg, uint16_t value);
+    void set(WordRegister reg, uint16_t value, bool tick = true);
 
     void tick();
 

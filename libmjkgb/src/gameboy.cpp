@@ -4,9 +4,9 @@
 #include "mjkgb.hpp"
 #include "gameboy_impl.hpp"
 
-using namespace std;
-
 namespace mjkgb {
+
+using namespace std;
 
 Gameboy::Gameboy()
   : pimpl_(new Gameboy::impl)

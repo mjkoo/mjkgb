@@ -2,9 +2,9 @@
 
 #include "mmu.hpp"
 
-using namespace std;
-
 namespace mjkgb {
+
+using namespace std;
 
 Mmu::Mmu()
   : memory_()

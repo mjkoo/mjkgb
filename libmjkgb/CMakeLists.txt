@@ -10,6 +10,7 @@ add_library(libmjkgb
     ./src/mmu.cpp
     ./src/gameboy.cpp
     ./src/gameboy_impl.cpp
+    ./src/opcodes.cpp
 )
 set_target_properties(libmjkgb PROPERTIES PREFIX "")
 

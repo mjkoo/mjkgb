@@ -15,8 +15,10 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         "-Weverything"
         "-Wno-padded"
         "-Wno-shadow"
+        "-Wno-unused-function"
         "-Wno-unused-parameter"
         "-Wno-global-constructors"
+        "-Wno-missing-prototypes"
         "-Wno-c++11-extensions"
         "-Wno-c++98-compat")
     foreach(flag ${EXTRA_CXX_FLAGS})
