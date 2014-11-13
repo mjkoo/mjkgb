@@ -9,7 +9,7 @@ set(CMAKE_MODULE_PATH
 
 include(EnableCXX11)
 
-if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     set(EXTRA_CXX_FLAGS
         "-Werror"
         "-Weverything"
@@ -24,7 +24,9 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     foreach(flag ${EXTRA_CXX_FLAGS})
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${flag}")
     endforeach()
-endif ()
+else()
+    message(WARNING "C++ compiler is not clang, unsupported configuration")
+endif()
 
 add_subdirectory(libmjkgb)
 add_subdirectory(tests)

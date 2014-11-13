@@ -11,8 +11,15 @@ class Mmu {
 public:
     Mmu();
 
-    uint8_t get(uint16_t address) const;
-    void set(uint16_t address, uint8_t value);
+    inline uint8_t get(uint16_t address) const
+    {
+        return memory_[address];
+    }
+
+    inline void set(uint16_t address, uint8_t value)
+    {
+        memory_[address] = value;
+    }
 
     void load(const std::string &filename);
 

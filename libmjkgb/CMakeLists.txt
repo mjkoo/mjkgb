@@ -2,7 +2,7 @@ find_program(CLANG_EXECUTABLE
     NAMES clang
 )
 
-if (CLANG_EXECUTABLE)
+if(CLANG_EXECUTABLE)
     message(STATUS "Found clang: ${CLANG_EXECUTABLE}")
 else()
     message(FATAL_ERROR "Cound not find clang")
@@ -10,8 +10,21 @@ endif()
 
 # Use clang to automatically generate llvm bytecode for all opcodes
 # See https://stackoverflow.com/questions/14776463/compile-and-add-object-file-from-binary-with-cmake
+if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+    set(EMIT_LLVM_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG}")
+elseif(${CMAKE_BUILD_TYPE} STREQUAL "Release")
+    set(EMIT_LLVM_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE}")
+elseif(${CMAKE_BUILD_TYPE} STREQUAL "RelWithDebInfo")
+    set(EMIT_LLVM_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
+elseif(${CMAKE_BUILD_TYPE} STREQUAL "MinSizeRel")
+    set(EMIT_LLVM_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_MINSIZEREL}")
+else()
+    set(EMIT_LLVM_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+endif()
+string(REPLACE " " ";" EMIT_LLVM_CXX_FLAGS ${EMIT_LLVM_CXX_FLAGS})
+
 add_custom_command(OUTPUT opcodes.o
-    COMMAND ${CLANG_EXECUTABLE} -std=c++11 -emit-llvm -o opcodes.bc -DEMIT_LLVM
+    COMMAND ${CLANG_EXECUTABLE} ${EMIT_LLVM_CXX_FLAGS} -DEMIT_LLVM -emit-llvm -o opcodes.bc
         -I ${CMAKE_CURRENT_SOURCE_DIR}/include
         -c ${CMAKE_CURRENT_SOURCE_DIR}/src/opcodes.cpp
     COMMAND ld -r -b binary -o opcodes.o opcodes.bc
