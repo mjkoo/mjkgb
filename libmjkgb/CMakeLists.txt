@@ -11,7 +11,7 @@ endif()
 # Use clang to automatically generate llvm bytecode for all opcodes
 # See https://stackoverflow.com/questions/14776463/compile-and-add-object-file-from-binary-with-cmake
 add_custom_command(OUTPUT opcodes.o
-    COMMAND ${CLANG_EXECUTABLE} -std=c++11 -emit-llvm -o opcodes.bc
+    COMMAND ${CLANG_EXECUTABLE} -std=c++11 -emit-llvm -o opcodes.bc -DEMIT_LLVM
         -I ${CMAKE_CURRENT_SOURCE_DIR}/include
         -c ${CMAKE_CURRENT_SOURCE_DIR}/src/opcodes.cpp
     COMMAND ld -r -b binary -o opcodes.o opcodes.bc
