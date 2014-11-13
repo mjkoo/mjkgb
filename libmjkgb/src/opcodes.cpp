@@ -35,9 +35,10 @@ void di(GameboyImpl &gb)
     gb.disable_interrupts();
 }
 
-void reset(GameboyImpl &gb)
+template<uint16_t off>
+void rst(GameboyImpl &gb)
 {
-    gb.reset();
+    gb.restart(off);
 }
 
 template<typename Dst, typename Src>
@@ -52,10 +53,20 @@ void inc_dec(GameboyImpl &gb, Operand op)
     gb.set(op, gb.get(op) + inc);
 }
 
-template<AluOperation op, typename Dst, typename Src, bool carry>
-void add(GameboyImpl &gb, Dst dst, Src src)
+template<AluOperation type, typename Operand, bool carry>
+void alu_op(GameboyImpl &gb, Operand op)
 {
-    switch (op) {
+    switch (type) {
+    default:
+        break;
+    }
+    // Special case for ADD SP, r8 (opcode 0xe8), needs extra tick
+}
+
+template<RotateShiftOperation type, typename Operand>
+void rot_shft_op(GameboyImpl &gb, Operand op)
+{
+    switch (type) {
     default:
         break;
     }

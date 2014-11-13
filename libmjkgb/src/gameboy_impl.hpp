@@ -35,9 +35,10 @@ public:
 
     void load(const std::string &filename);
 
+    void tick();
     void stop();
     void halt();
-    void reset();
+    void restart(uint8_t n);
     void enable_interrupts();
     void disable_interrupts();
 
