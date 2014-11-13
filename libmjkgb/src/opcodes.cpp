@@ -47,12 +47,6 @@ void ld(GameboyImpl &gb, Dst dst, Src src)
     gb.set(dst, gb.get(src));
 }
 
-template<typename Operand, int inc>
-void inc_dec(GameboyImpl &gb, Operand op)
-{
-    gb.set(op, gb.get(op) + inc);
-}
-
 template<AluOperation type, typename Operand, bool carry>
 void alu_op(GameboyImpl &gb, Operand op)
 {

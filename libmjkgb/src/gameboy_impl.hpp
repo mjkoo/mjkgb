@@ -213,6 +213,4 @@ struct accessor<WordImmediate> {
 
 }
 
-#undef INLINE
-
 #endif /* GAMEBOY_IMPL_HPP_ */
