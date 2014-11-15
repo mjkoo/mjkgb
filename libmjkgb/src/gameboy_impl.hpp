@@ -58,7 +58,7 @@ class Gameboy::impl : public GameboyImpl { };
  */
 template<>
 struct accessor<ByteRegister> {
-    typedef uint8_t value_type;
+    using value_type = uint8_t;
 
     value_type get(GameboyImpl &gb, ByteRegister reg) const
     {
@@ -73,7 +73,7 @@ struct accessor<ByteRegister> {
 
 template<>
 struct accessor<WordRegister> {
-    typedef uint16_t value_type;
+    using value_type = uint16_t;
 
     value_type get(GameboyImpl &gb, WordRegister reg) const
     {
@@ -88,7 +88,7 @@ struct accessor<WordRegister> {
 
 template<>
 struct accessor<ConditionCode> {
-    typedef bool value_type;
+    using value_type = bool;
 
     value_type get(GameboyImpl &gb, ConditionCode cc) const
     {
@@ -111,11 +111,11 @@ struct accessor<ConditionCode> {
 
 template<typename T, int inc, int off>
 struct accessor<BytePointer<T, inc, off>> {
-    typedef uint8_t value_type;
+    using value_type = uint8_t;
 
     value_type get(GameboyImpl &gb, BytePointer<T, inc, off> ptr) const
     {
-        typedef typename accessor<T>::value_type operand_type;
+        using operand_type = typename accessor<T>::value_type;
         uint16_t address = sizeof(operand_type) == 1 ? 0xff00 : 0;
         address |= gb.get(ptr.value);
         address += off;
@@ -131,7 +131,7 @@ struct accessor<BytePointer<T, inc, off>> {
 
     void set(GameboyImpl &gb, BytePointer<T, inc, off> ptr, value_type value) const
     {
-        typedef typename accessor<T>::value_type operand_type;
+        using operand_type = typename accessor<T>::value_type;
         uint16_t address = sizeof(typename accessor<T>::value_type) == 1 ? 0xff00 : 0;
         address |= gb.get(ptr.value);
         address += off;
@@ -146,12 +146,12 @@ struct accessor<BytePointer<T, inc, off>> {
 
 template<typename T, int inc, int off>
 struct accessor<WordPointer<T, inc, off>> {
-    typedef uint16_t value_type;
+    using value_type = uint16_t;
 
     value_type get(GameboyImpl &gb, WordPointer<T, inc, off> ptr) const
     {
-        typedef typename accessor<T>::value_type operand_type;
-        uint16_t address = sizeof(typename accessor<T>::value_type) == 1 ? 0xff00 : 0;
+        using operand_type = typename accessor<T>::value_type;
+        uint16_t address = sizeof(operand_type) == 1 ? 0xff00 : 0;
         address |= gb.get(ptr.value);
         address += off;
 
@@ -168,8 +168,8 @@ struct accessor<WordPointer<T, inc, off>> {
 
     void set(GameboyImpl &gb, WordPointer<T, inc, off> ptr, value_type value) const
     {
-        typedef typename accessor<T>::value_type operand_type;
-        uint16_t address = sizeof(typename accessor<T>::value_type) == 1 ? 0xff00 : 0;
+        using operand_type =typename accessor<T>::value_type;
+        uint16_t address = sizeof(operand_type) == 1 ? 0xff00 : 0;
         address |= gb.get(ptr.value);
         address += off;
 
@@ -185,7 +185,7 @@ struct accessor<WordPointer<T, inc, off>> {
 
 template<>
 struct accessor<ByteImmediate> {
-    typedef uint8_t value_type;
+    using value_type = uint8_t;
 
     value_type get(GameboyImpl &gb, ByteImmediate) const
     {
@@ -199,7 +199,7 @@ struct accessor<ByteImmediate> {
 
 template<>
 struct accessor<WordImmediate> {
-    typedef uint16_t value_type;
+    using value_type = uint16_t;
 
     value_type get(GameboyImpl &gb, WordImmediate) const
     {

@@ -1,4 +1,7 @@
+#include "cpu.hpp"
+#include "mmu.hpp"
 #include "gameboy_impl.hpp"
+#include "operands.hpp"
 
 namespace {
 
@@ -65,7 +68,6 @@ void rot_shft_op(GameboyImpl &gb, Operand op)
         break;
     }
 }
-
 
 }
 
