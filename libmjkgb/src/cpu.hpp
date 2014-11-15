@@ -38,6 +38,10 @@ public:
     }
 
     void tick();
+    void stop();
+    void halt();
+    void enable_interrupts();
+    void disable_interrupts();
 
 private:
     static constexpr int num_registers =

@@ -17,8 +17,7 @@ template<typename T> struct accessor;
  * implement Gameboy::impl due to it being private. Also don't want to make
  * Gameboy::impl public. Use inheritance to work around this issue.
  */
-class GameboyImpl {
-public:
+struct GameboyImpl {
     GameboyImpl();
 
     template<typename T>
@@ -35,16 +34,8 @@ public:
 
     void load(const std::string &filename);
 
-    void tick();
-    void stop();
-    void halt();
-    void restart(uint8_t n);
-    void enable_interrupts();
-    void disable_interrupts();
-
     void run();
 
-private:
     Cpu cpu_;
     Mmu mmu_;
 
@@ -67,7 +58,10 @@ struct accessor<ByteRegister> {
 
     void set(GameboyImpl &gb, ByteRegister reg, value_type value) const
     {
-        gb.cpu_.set(reg, value);
+        if (reg != ByteRegister::F)
+            gb.cpu_.set(reg, value);
+        else
+            gb.cpu_.set(ByteRegister::F, value & 0xf0);
     }
 };
 
@@ -82,7 +76,10 @@ struct accessor<WordRegister> {
 
     void set(GameboyImpl &gb, WordRegister reg, value_type value) const
     {
-        return gb.cpu_.set(reg, value);
+        if (reg != WordRegister::AF)
+            gb.cpu_.set(reg, value);
+        else
+            gb.cpu_.set(WordRegister::AF, value & 0xfff0);
     }
 };
 
@@ -141,8 +138,7 @@ struct accessor<BytePointer<T, inc, off>> {
 
         if (inc)
             gb.set(ptr.value, static_cast<operand_type>(gb.get(ptr.value) + inc));
-    }
-};
+    } };
 
 template<typename T, int inc, int off>
 struct accessor<WordPointer<T, inc, off>> {
@@ -209,6 +205,19 @@ struct accessor<WordImmediate> {
     }
 
     void set(GameboyImpl &, WordImmediate, value_type) const;
+};
+
+template<>
+struct accessor<Displacement> {
+    using value_type = int8_t;
+
+    value_type get(GameboyImpl &gb, Displacement) const
+    {
+        auto ret = accessor<ByteImmediate>().get(gb, ByteImmediate());
+        return static_cast<value_type>(ret);
+    }
+
+    void set(GameboyImpl &, Displacement, value_type) const;
 };
 
 }

@@ -12,5 +12,25 @@ void Cpu::tick()
     clock_++;
 }
 
+void Cpu::stop()
+{
+
+}
+
+void Cpu::halt()
+{
+
+}
+
+void Cpu::enable_interrupts()
+{
+
+}
+
+void Cpu::disable_interrupts()
+{
+
+}
+
 }
 

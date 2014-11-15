@@ -12,7 +12,7 @@ enum class WordRegister {
 };
 
 enum class ConditionCode {
-    Z, H, N, C
+    C, H, N, Z
 };
 
 template<typename T, int inc = 0, int off = 0>
@@ -33,6 +33,8 @@ struct WordPointer {
 
 struct ByteImmediate { };
 struct WordImmediate { };
+
+struct Displacement{ };
 
 }
 
