@@ -33,14 +33,14 @@ TEST_F(AccessorsTest, WordRegister) {
     EXPECT_EQ(0, gb.get(WordRegister::AF));
 
     gb.set(WordRegister::AF, 0xdead);
-    EXPECT_EQ(0xdead, gb.get(WordRegister::AF));
+    EXPECT_EQ(0xdea0, gb.get(WordRegister::AF));
     EXPECT_EQ(0xde, gb.get(ByteRegister::A));
-    EXPECT_EQ(0xad, gb.get(ByteRegister::F));
+    EXPECT_EQ(0xa0, gb.get(ByteRegister::F));
 
     gb.set(WordRegister::AF, gb.get(WordRegister::AF) + 1);
-    EXPECT_EQ(0xdeae, gb.get(WordRegister::AF));
+    EXPECT_EQ(0xdea0, gb.get(WordRegister::AF));
     EXPECT_EQ(0xde, gb.get(ByteRegister::A));
-    EXPECT_EQ(0xae, gb.get(ByteRegister::F));
+    EXPECT_EQ(0xa0, gb.get(ByteRegister::F));
 
     EXPECT_EQ(0, gb.get(WordRegister::DE));
 
