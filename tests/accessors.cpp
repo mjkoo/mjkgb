@@ -73,6 +73,18 @@ TEST_F(AccessorsTest, ConditionCode) {
     EXPECT_EQ(false, gb.get(ConditionCode::Z));
 }
 
+TEST_F(AccessorsTest, Constant) {
+    EXPECT_EQ(1, gb.get(Constant<1>()));
+    EXPECT_EQ(-1, gb.get(Constant<-1>()));
+}
+
+TEST_F(AccessorsTest, Ignore) {
+    auto ign = Ignore<Constant<1>>(Constant<1>());
+    EXPECT_EQ(1, gb.get(ign));
+    gb.set(ign, -1); 
+    EXPECT_EQ(1, gb.get(ign));
+}
+
 TEST_F(AccessorsTest, BytePointer) {
     auto ptr0 = BytePointer<ByteRegister, 0>(ByteRegister::A);
     EXPECT_EQ(0, gb.get(ptr0));
@@ -169,6 +181,22 @@ TEST_F(AccessorsTest, WordImmediate) {
     gb.set(WordPointer<WordRegister>(WordRegister::HL), 0xdead);
     EXPECT_EQ(0xdead, gb.get(WordImmediate()));
     EXPECT_EQ(4, gb.get(WordRegister::PC));
+}
+
+TEST_F(AccessorsTest, Displacement) {
+    EXPECT_EQ(0, gb.get(WordRegister::PC));
+    EXPECT_EQ(0, gb.get(Displacement()));
+    EXPECT_EQ(1, gb.get(WordRegister::PC));
+
+    gb.set(WordRegister::HL, 1);
+    gb.set(BytePointer<WordRegister>(WordRegister::HL), 0x1);
+    EXPECT_EQ(0x1, gb.get(Displacement()));
+    EXPECT_EQ(2, gb.get(WordRegister::PC));
+
+    gb.set(WordRegister::HL, 2);
+    gb.set(BytePointer<WordRegister>(WordRegister::HL), 0xff);
+    EXPECT_EQ(-0x1, gb.get(Displacement()));
+    EXPECT_EQ(3, gb.get(WordRegister::PC));
 }
 
 }

@@ -73,23 +73,101 @@ void add_sub(GameboyImpl &gb, Dst dst, Src src)
     auto result = dst_value + src_value;
 
     gb.set(dst, static_cast<result_type>(result));
-    gb.set(ConditionCode::C, result < dst_value);
-    gb.set(ConditionCode::H, (result ^ dst_value ^ src_value) & half_carry_mask);
+    gb.set(ConditionCode::Z, result);
     gb.set(ConditionCode::N, sub);
+    gb.set(ConditionCode::H, (result ^ dst_value ^ src_value) & half_carry_mask);
+    gb.set(ConditionCode::C, result < dst_value);
+}
+
+template<typename Dst, typename Src>
+void add(GameboyImpl &gb, Dst dst, Src src)
+{
+    add_sub<Dst, Src, false, false>(gb, dst, src);
+}
+
+template<typename Dst, typename Src>
+void adc(GameboyImpl &gb, Dst dst, Src src)
+{
+    add_sub<Dst, Src, false, true>(gb, dst, src);
+}
+
+template<typename Dst, typename Src>
+void sub(GameboyImpl &gb, Dst dst, Src src)
+{
+    add_sub<Dst, Src, true, false>(gb, dst, src);
+}
+
+template<typename Dst, typename Src>
+void sbc(GameboyImpl &gb, Dst dst, Src src)
+{
+    add_sub<Dst, Src, true, true>(gb, dst, src);
+}
+
+template<typename Op>
+void inc(GameboyImpl &gb, Op op)
+{
+    add(op, Constant<1>());
+}
+
+template<typename Op>
+void dec(GameboyImpl &gb, Op op)
+{
+    sub(op, Constant<1>());
+}
+
+template<typename Op>
+void cp(GameboyImpl &gb, Op op)
+{
+    sub(gb, Ignore<ByteRegister>(ByteRegister::A), op);
+}
+
+enum class BitwiseOperation {
+    AND, OR, XOR
+};
+
+template<typename Dst, typename Src, BitwiseOperation kind>
+void and_or_xor(GameboyImpl &gb, Dst dst, Src src)
+{
+    static_assert(sizeof(Dst::value_type) == sizeof(Src::value_type),
+            "Invalid ALU operation");
+    static_assert(sizeof(Dst::value_type) == 1,
+            "No 16-bit AND");
+
+    typename Dst::value_type result;
+    switch (kind) {
+    case BitwiseOperation::AND:
+        result = gb.get(dst) & gb.get(src);
+        break;
+    case BitwiseOperation::OR:
+        result = gb.get(dst) | gb.get(src);
+        break;
+    case BitwiseOperation::XOR:
+        result = gb.get(dst) ^ gb.get(src);
+        break;
+    }
+
+    gb.set(dst, result);
+    gb.set(ByteRegister::F, kind == BitwiseOperation::AND ? 0x20 : 0x00);
     gb.set(ConditionCode::Z, result);
 }
 
 template<typename Dst, typename Src>
-void add(GameboyImpl &gb, Dst dst, Src src) { add_sub<Dst, Src, false, false>(gb, dst, src); }
+void and_(GameboyImpl &gb, Dst dst, Src src)
+{
+    and_or_xor<Dst, Src, BitwiseOperation::AND>(gb, dst, src);
+}
 
 template<typename Dst, typename Src>
-void adc(GameboyImpl &gb, Dst dst, Src src) { add_sub<Dst, Src, false, true>(gb, dst, src); }
+void or_(GameboyImpl &gb, Dst dst, Src src)
+{
+    and_or_xor<Dst, Src, BitwiseOperation::OR>(gb, dst, src);
+}
 
 template<typename Dst, typename Src>
-void sub(GameboyImpl &gb, Dst dst, Src src) { add_sub<Dst, Src, true, false>(gb, dst, src); }
-
-template<typename Dst, typename Src>
-void sbc(GameboyImpl &gb, Dst dst, Src src) { add_sub<Dst, Src, true, true>(gb, dst, src); }
+void xor_(GameboyImpl &gb, Dst dst, Src src)
+{
+    and_or_xor<Dst, Src, BitwiseOperation::XOR>(gb, dst, src);
+}
 
 }
 

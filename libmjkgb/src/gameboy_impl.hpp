@@ -90,20 +90,46 @@ struct accessor<ConditionCode> {
     value_type get(GameboyImpl &gb, ConditionCode cc) const
     {
         auto flags = gb.cpu_.get(ByteRegister::F);
-        return (flags & (1 << (static_cast<int>(cc) + 4))) != 0;
+        auto mask = 1 << ((3 - static_cast<int>(cc)) + 4);
+        return (flags & mask) != 0;
     }
 
     void set(GameboyImpl &gb, ConditionCode cc, value_type value) const
     {
         auto flags = gb.cpu_.get(ByteRegister::F);
+        auto mask = 1 << ((3 - static_cast<int>(cc)) + 4);
 
         if (value)
-            flags |= (1 << (static_cast<int>(cc) + 4));
+            flags |= mask;
         else
-            flags &= ~(1 << (static_cast<int>(cc) + 4));
+            flags &= ~mask;
 
         gb.cpu_.set(ByteRegister::F, flags);
     }
+};
+
+template<int value>
+struct accessor<Constant<value>> {
+    using value_type = int;
+
+    value_type get(GameboyImpl &gb, Constant<value>) const
+    {
+        return value;
+    }
+
+    void set(GameboyImpl &gb, Constant<value>) const;
+};
+
+template<typename T>
+struct accessor<Ignore<T>> {
+    using value_type = typename accessor<T>::value_type;
+
+    value_type get(GameboyImpl &gb, Ignore<T> ign) const
+    {
+        return gb.get(ign.value);
+    }
+
+    void set(GameboyImpl &gb, Ignore<T>, value_type) const { }
 };
 
 template<typename T, int inc, int off>
