@@ -8,7 +8,7 @@ else()
     message(FATAL_ERROR "Cound not find clang")
 endif()
 
-# Use clang to automatically generate llvm bytecode for all opcodes
+# Use clang to automatically generate llvm biecode for all opcodes
 # See https://stackoverflow.com/questions/14776463/compile-and-add-object-file-from-binary-with-cmake
 if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
     set(EMIT_LLVM_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG}")

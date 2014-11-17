@@ -510,10 +510,12 @@ void name(GameboyImpl &gb)                              \
 
 using opcode_func_type = void (*)(GameboyImpl &);
 #define X(name, def, is_jump, cycles) name,
+__attribute__((used))
 const opcode_func_type opcode_funcs[] = {
 #include "opcode_map.in"
 };
 
+__attribute__((used))
 const opcode_func_type cb_opcode_funcs[] = {
 #include "cb_opcode_map.in"
 };
