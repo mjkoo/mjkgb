@@ -1,3 +1,4 @@
+#include <cstdint>
 #include <type_traits>
 
 #include "cpu.hpp"
@@ -36,27 +37,18 @@ void di(GameboyImpl &gb)
     gb.cpu_.disable_interrupts();
 }
 
-template<uint16_t off>
-void rst(GameboyImpl &gb)
-{
-    gb.set(WordPointer<WordRegister, 0, -2>(WordRegister::SP), gb.get(WordRegister::PC));
-    gb.cpu_.set(WordRegister::PC, static_cast<uint16_t>(off), false);
-    gb.set(WordRegister::SP, gb.get(WordRegister::SP) - 2);
-}
-
 template<typename Dst, typename Src>
 void ld(GameboyImpl &gb, Dst dst, Src src)
 {
     gb.set(dst, gb.get(src));
 }
 
-/* This is really just for LD HL, (SP + e), but do it this way for consistency. */
-void ld(GameboyImpl &gb, WordRegister dst, WordPointer<WordRegister> src, Displacement)
+void ld_hl_sp_e(GameboyImpl &gb)
 {
     auto disp = gb.mmu_.get(gb.cpu_.get(WordRegister::PC));
     gb.cpu_.set(WordRegister::PC, gb.cpu_.get(WordRegister::PC) + 1);
-    auto addr = static_cast<uint16_t>(gb.cpu_.get(src.value) + disp);
-    gb.cpu_.set(dst, static_cast<uint16_t>(gb.mmu_.get(addr) | (gb.mmu_.get(addr + 1) << 8)));
+    auto addr = static_cast<uint16_t>(gb.cpu_.get(WordRegister::SP) + disp);
+    gb.cpu_.set(WordRegister::HL, static_cast<uint16_t>(gb.mmu_.get(addr) | (gb.mmu_.get(addr + 1) << 8)));
 }
 
 void push(GameboyImpl &gb, WordRegister reg)
@@ -285,12 +277,10 @@ void rotate_shift_op(GameboyImpl &gb, Op op)
 
     gb.set(op, static_cast<result_type>(value));
 
-    if (static_cast<int>(kind) >= 4) {
+    if (static_cast<int>(kind) >= 4)
         gb.set(ConditionCode::Z, value == 0);
-        gb.cpu_.tick();
-    } else {
+    else
         gb.set(ConditionCode::Z, false);
-    }
 
     gb.set(ConditionCode::N, false);
     gb.set(ConditionCode::H, false);
@@ -357,6 +347,73 @@ template<typename Op>
 void srl(GameboyImpl &gb, Op op)
 {
     rotate_shift_op<Op, RotateShiftOperation::SRL>(gb, op);
+}
+
+template<typename Op, unsigned int b>
+void bit(GameboyImpl &gb, Op op)
+{
+    gb.set(ConditionCode::Z, gb.get(op) & (1 << b));
+    gb.set(ConditionCode::N, false);
+    gb.set(ConditionCode::H, true);
+}
+
+template<typename Op, unsigned int b>
+void set(GameboyImpl &gb, Op op)
+{
+    gb.set(op, gb.get(op) | (1 << b));
+}
+
+template<typename Op, unsigned int b>
+void res(GameboyImpl &gb, Op op)
+{
+    gb.set(op, gb.get(op) & ~(1 << b));
+}
+
+template<typename Op, ConditionCode cc>
+void jp(GameboyImpl &gb, Op op)
+{
+    if (gb.get(cc))
+        ld(gb, WordRegister::PC, op);
+}
+
+void jp_hl(GameboyImpl &gb)
+{
+    gb.cpu_.set(WordRegister::PC, gb.get(WordRegister::HL), false);
+}
+
+template<ConditionCode cc>
+void jr(GameboyImpl &gb)
+{
+    auto disp = gb.get(Displacement());
+    if (gb.get(cc))
+        gb.set(WordRegister::PC, static_cast<uint16_t>(gb.get(WordRegister::PC) + disp));
+}
+
+template<typename Op, ConditionCode cc>
+void call(GameboyImpl &gb, Op op)
+{
+    auto dest = gb.get(op);
+    if (gb.get(cc)) {
+        gb.set(WordPointer<WordRegister, 0, -2>(WordRegister::SP), gb.get(WordRegister::PC));
+        gb.cpu_.set(WordRegister::PC, static_cast<uint16_t>(dest), false);
+        gb.set(WordRegister::SP, gb.get(WordRegister::SP) - 2);
+    }
+}
+
+template<uint16_t off>
+void rst(GameboyImpl &gb)
+{
+    call<Constant<off>, ConditionCode::UNCONDITIONAL>(gb, Constant<off>());
+}
+
+template<ConditionCode cc, bool enable_interrupts>
+void ret(GameboyImpl &gb)
+{
+    if (cc != ConditionCode::UNCONDITIONAL)
+        gb.cpu_.tick();
+
+    if (gb.get(cc))
+        gb.set(WordRegister::PC, gb.get(WordPointer<WordRegister, 2>(WordRegister::SP)));
 }
 
 }

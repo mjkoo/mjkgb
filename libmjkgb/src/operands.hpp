@@ -12,8 +12,18 @@ enum class WordRegister {
 };
 
 enum class ConditionCode {
-    Z, N, H, C
+    Z, N, H, C, UNCONDITIONAL
 };
+
+template<int value> struct Constant { };
+
+template<typename T> struct Ignore {
+    T value;
+    explicit Ignore(T value)
+      : value(value)
+    { }
+};
+
 
 template<typename T, int inc = 0, int off = 0>
 struct BytePointer {
@@ -34,15 +44,6 @@ struct WordPointer {
 struct ByteImmediate { };
 struct WordImmediate { };
 struct Displacement { };
-
-template<typename T> struct Ignore {
-    T value;
-    explicit Ignore(T value)
-      : value(value)
-    { }
-};
-
-template<int value> struct Constant { };
 
 }
 

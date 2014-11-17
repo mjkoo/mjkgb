@@ -89,6 +89,7 @@ struct accessor<ConditionCode> {
 
     value_type get(GameboyImpl &gb, ConditionCode cc) const
     {
+        if (cc == ConditionCode::UNCONDITIONAL) return true;
         auto flags = gb.cpu_.get(ByteRegister::F);
         auto mask = 1 << ((3 - static_cast<int>(cc)) + 4);
         return (flags & mask) != 0;
@@ -96,6 +97,8 @@ struct accessor<ConditionCode> {
 
     void set(GameboyImpl &gb, ConditionCode cc, value_type value) const
     {
+        if (cc == ConditionCode::UNCONDITIONAL) return;
+        
         auto flags = gb.cpu_.get(ByteRegister::F);
         auto mask = 1 << ((3 - static_cast<int>(cc)) + 4);
 
