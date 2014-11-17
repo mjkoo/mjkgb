@@ -203,8 +203,10 @@ void swap(GameboyImpl &gb, Op op)
     static_assert(sizeof(result_type) == 1,
             "Invalid ALU operation");
 
-    auto op_value = gb.get(op);
-    gb.set(op, (op_value & 0xf) << 4 | ((op_value & 0xf0) >> 4));
+    auto value = gb.get(op);
+    auto result = static_cast<result_type>((value & 0xf) << 4 |
+            ((value & 0xf0) >> 4));
+    gb.set(op, result);
 }
 
 void daa(GameboyImpl &gb)
@@ -430,21 +432,105 @@ void ret(GameboyImpl &gb)
         gb.set(WordRegister::PC, gb.get(word_ptr<2>(WordRegister::SP)));
 }
 
-void cb_prefix(GameboyImpl &gb)
-{
-
-}
+void cb_prefix(GameboyImpl &gb);
 
 } /* anonymous namespace */
 } /* namespace opcodes */
 
 #ifndef EMIT_LLVM
+
+/* Dispatch opcodes using a computed goto, see article at 
+ * http://eli.thegreenplace.net/2012/07/12/computed-goto-for-efficient-dispatch-tables
+ * for a good description. We use this less for efficiency reasons, and more for
+ * syntactic/convenience reasons.
+ */
 void GameboyImpl::run()
 {
-#define X(name, def, is_jump, cycles) do { auto name = def; name(*this); } while (0)
+    uint8_t opcode;
+    static const void *dispatch_table[] = {
+#define X(name, def, is_jump, cycles) &&name,
 #include "opcode_map.in"
 #undef X
+    };
+#define DISPATCH() do {                                     \
+    opcode = get(ByteImmediate());                          \
+    goto *dispatch_table[opcode];                           \
+} while (false);
+
+    DISPATCH();
+    while (true) {
+#define X(name, def, is_jump, cycles) do {                  \
+    name:                                                   \
+        def(*this);                                         \
+        DISPATCH();                                         \
+} while (false);
+#include "opcode_map.in"
+#undef X
+    }
 }
+
+namespace opcodes {
+namespace {
+
+void cb_prefix(GameboyImpl &gb)
+{
+    static const void *dispatch_table[] = {
+#define X(name, def, is_jump, cycles) &&name,
+#include "cb_opcode_map.in"
+#undef X
+    };
+
+    auto opcode = gb.get(ByteImmediate());
+    goto *dispatch_table[opcode];
+
+#define X(name, def, is_jump, cycles) do {                  \
+    name:                                                   \
+        def(gb);                                            \
+        return;                                             \
+} while (false);
+#include "cb_opcode_map.in"
+#undef X
+}
+
+} /* anonymous namespace */
+} /* namespace opcodes */
+
+#else
+
+extern "C" {
+#define X(name, def, is_jump, cycles)                       \
+void name(GameboyImpl &gb)                              \
+{                                                       \
+    def(gb);                                            \
+}
+#include "opcode_map.in"
+#include "cb_opcode_map.in"
+#undef X
+}
+
+using opcode_func_type = void (*)(GameboyImpl &);
+#define X(name, def, is_jump, cycles) name,
+const opcode_func_type opcode_funcs[] = {
+#include "opcode_map.in"
+};
+
+const opcode_func_type cb_opcode_funcs[] = {
+#include "cb_opcode_map.in"
+};
+#undef X
+
+namespace opcodes {
+namespace {
+
+void cb_prefix(GameboyImpl &gb)
+{
+    auto opcode = gb.get(ByteImmediate());
+    cb_opcode_funcs[opcode](gb);
+}
+
+} /* anonymous namespace */
+} /* namespace opcodes */
+
 #endif
 
 }

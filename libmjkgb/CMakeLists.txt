@@ -30,6 +30,7 @@ add_custom_command(OUTPUT opcodes.o
     COMMAND ld -r -b binary -o opcodes.o opcodes.bc
     COMMAND objcopy --rename-section .data=.rodata,alloc,load,readonly,data,contents
         ${CMAKE_CURRENT_BINARY_DIR}/opcodes.o ${CMAKE_CURRENT_BINARY_DIR}/opcodes.o
+    IMPLICIT_DEPENDS CXX ./src/opcodes.cpp
 )
 add_library(opcodes STATIC opcodes.o)
 set_source_files_properties(opcodes.o
