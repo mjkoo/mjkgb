@@ -1,4 +1,5 @@
 #include <cstdint>
+#include <functional>
 #include <type_traits>
 
 #include "cpu.hpp"
@@ -6,15 +7,17 @@
 #include "gameboy_impl.hpp"
 #include "operands.hpp"
 
-namespace {
+namespace mjkgb {
 
 using namespace std;
-using namespace mjkgb;
 
-void unimplemented_opcode(GameboyImpl &gb)
-{ }
+namespace opcodes {
+namespace {
 
 void nop(GameboyImpl &)
+{ }
+
+void undefined(GameboyImpl &gb)
 { }
 
 void stop(GameboyImpl &gb)
@@ -43,35 +46,26 @@ void ld(GameboyImpl &gb, Dst dst, Src src)
     gb.set(dst, gb.get(src));
 }
 
-void ld_hl_sp_e(GameboyImpl &gb)
+void ld_hl_sp_n(GameboyImpl &gb)
 {
-    auto disp = gb.mmu_.get(gb.cpu_.get(WordRegister::PC));
-    gb.cpu_.set(WordRegister::PC, gb.cpu_.get(WordRegister::PC) + 1);
-    auto addr = static_cast<uint16_t>(gb.cpu_.get(WordRegister::SP) + disp);
-    gb.cpu_.set(WordRegister::HL, static_cast<uint16_t>(gb.mmu_.get(addr) | (gb.mmu_.get(addr + 1) << 8)));
+    auto disp = static_cast<int8_t>(gb.get(ByteImmediate()));
+    gb.set(WordRegister::HL, static_cast<uint16_t>(gb.get(WordRegister::SP) + disp));
 }
 
 void push(GameboyImpl &gb, WordRegister reg)
 {
-    ld(gb, WordPointer<WordRegister, -2>(WordRegister::SP), reg);
+    ld(gb, word_ptr<-2>(WordRegister::SP), reg);
 }
 
 void pop(GameboyImpl &gb, WordRegister reg)
 {
-    ld(gb, reg, WordPointer<WordRegister, 2>(WordRegister::SP));
+    ld(gb, reg, word_ptr(WordRegister::SP));
+    gb.cpu_.set(WordRegister::SP, gb.get(WordRegister::SP) + 2);
 }
 
-template<typename Dst, typename Src, bool sub, bool carry>
+template<bool sub, bool carry, typename Dst, typename Src>
 void add_sub(GameboyImpl &gb, Dst dst, Src src)
 {
-    static_assert(!is_same<Src, Constant<1>>::value ?
-            sizeof(typename accessor<Dst>::value_type) ==
-            sizeof(typename accessor<Src>::value_type) :
-            true,
-            "Invalid ALU operation");
-    static_assert(!(sizeof(typename accessor<Dst>::value_type) == 2 && sub),
-            "No 16-bit subtraction");
-
     using result_type = typename accessor<Dst>::value_type;
     constexpr auto half_carry_mask = 1 << (8 * sizeof(result_type) - 4);
 
@@ -91,28 +85,37 @@ void add_sub(GameboyImpl &gb, Dst dst, Src src)
 template<typename Dst, typename Src>
 void add(GameboyImpl &gb, Dst dst, Src src)
 {
-    add_sub<Dst, Src, false, false>(gb, dst, src);
+    add_sub<false, false>(gb, dst, src);
+}
+
+void add_sp_n(GameboyImpl &gb)
+{
+    add(gb, WordRegister::SP, ByteImmediate());
+    gb.set(ConditionCode::Z, false);
+    gb.cpu_.tick();
 }
 
 template<typename Dst, typename Src>
 void adc(GameboyImpl &gb, Dst dst, Src src)
 {
-    add_sub<Dst, Src, false, true>(gb, dst, src);
+    add_sub<false, true>(gb, dst, src);
 }
 
 template<typename Dst, typename Src>
 void sub(GameboyImpl &gb, Dst dst, Src src)
 {
-    add_sub<Dst, Src, true, false>(gb, dst, src);
+    add_sub<true, false>(gb, dst, src);
 }
 
 template<typename Dst, typename Src>
 void sbc(GameboyImpl &gb, Dst dst, Src src)
 {
-    add_sub<Dst, Src, true, true>(gb, dst, src);
+    add_sub<true, true>(gb, dst, src);
 }
 
-void inc(GameboyImpl &gb, ByteRegister op)
+template<typename Op>
+typename enable_if<!is_same<Op, WordRegister>::value, void>::type
+inc(GameboyImpl &gb, Op op)
 {
     auto carry_flag = gb.get(ConditionCode::C);
     add(gb, op, Constant<1>());
@@ -124,7 +127,9 @@ void inc(GameboyImpl &gb, WordRegister op)
     gb.set(op, gb.get(op) + 1);
 }
 
-void dec(GameboyImpl &gb, ByteRegister op)
+template<typename Op>
+typename enable_if<!is_same<Op, WordRegister>::value, void>::type
+dec(GameboyImpl &gb, Op op)
 {
     auto carry_flag = gb.get(ConditionCode::C);
     sub(gb, op, Constant<1>());
@@ -146,13 +151,15 @@ enum class BitwiseOperation {
     AND, OR, XOR
 };
 
-template<typename Op, BitwiseOperation kind>
+template<BitwiseOperation kind, typename Op>
 void bitwise_op(GameboyImpl &gb, Op op)
 {
-    static_assert(sizeof(Op::value_type) == 1,
+    using result_type = typename accessor<Op>::value_type;
+
+    static_assert(sizeof(result_type) == 1,
             "Invalid ALU operation");
 
-    typename Op::value_type result;
+    result_type result;
     switch (kind) {
     case BitwiseOperation::AND:
         result = gb.get(ByteRegister::A) & gb.get(op);
@@ -170,28 +177,30 @@ void bitwise_op(GameboyImpl &gb, Op op)
     gb.set(ConditionCode::Z, result);
 }
 
-template<typename Dst, typename Src>
-void and_(GameboyImpl &gb, Dst dst, Src src)
+template<typename Op>
+void and_(GameboyImpl &gb, Op op)
 {
-    bitwise_op<Dst, Src, BitwiseOperation::AND>(gb, dst, src);
+    bitwise_op<BitwiseOperation::AND>(gb, op);
 }
 
-template<typename Dst, typename Src>
-void or_(GameboyImpl &gb, Dst dst, Src src)
+template<typename Op>
+void or_(GameboyImpl &gb, Op op)
 {
-    bitwise_op<Dst, Src, BitwiseOperation::OR>(gb, dst, src);
+    bitwise_op<BitwiseOperation::OR>(gb, op);
 }
 
-template<typename Dst, typename Src>
-void xor_(GameboyImpl &gb, Dst dst, Src src)
+template<typename Op>
+void xor_(GameboyImpl &gb, Op op)
 {
-    bitwise_op<Dst, Src, BitwiseOperation::XOR>(gb, dst, src);
+    bitwise_op<BitwiseOperation::XOR>(gb, op);
 }
 
 template<typename Op>
 void swap(GameboyImpl &gb, Op op)
 {
-    static_assert(sizeof(Op::value_type) == 1,
+    using result_type = typename accessor<Op>::value_type;
+
+    static_assert(sizeof(result_type) == 1,
             "Invalid ALU operation");
 
     auto op_value = gb.get(op);
@@ -226,14 +235,14 @@ enum class RotateShiftOperation {
     RLCA, RLA, RRCA, RRA, RLC, RL, RRC, RR, SLA, SRA, SRL
 };
 
-template<typename Op, RotateShiftOperation kind>
+template<RotateShiftOperation kind, typename Op>
 void rotate_shift_op(GameboyImpl &gb, Op op)
 {
+    using result_type = typename accessor<Op>::value_type;
+
     static_assert(static_cast<int>(kind) < 4 ?
             is_same<Op, ByteRegister>::value : true,
             "Invalid rotate/shift operation");
-
-    using result_type = typename accessor<Op>::value_type;
 
     int result;
     auto value = gb.get(op);
@@ -289,67 +298,67 @@ void rotate_shift_op(GameboyImpl &gb, Op op)
 
 void rlca(GameboyImpl &gb)
 {
-    rotate_shift_op<ByteRegister, RotateShiftOperation::RLCA>(gb, ByteRegister::A);
+    rotate_shift_op<RotateShiftOperation::RLCA>(gb, ByteRegister::A);
 }
 
 void rla(GameboyImpl &gb)
 {
-    rotate_shift_op<ByteRegister, RotateShiftOperation::RLA>(gb, ByteRegister::A);
+    rotate_shift_op<RotateShiftOperation::RLA>(gb, ByteRegister::A);
 }
 
 void rrca(GameboyImpl &gb)
 {
-    rotate_shift_op<ByteRegister, RotateShiftOperation::RRCA>(gb, ByteRegister::A);
+    rotate_shift_op<RotateShiftOperation::RRCA>(gb, ByteRegister::A);
 }
 
 void rra(GameboyImpl &gb)
 {
-    rotate_shift_op<ByteRegister, RotateShiftOperation::RRA>(gb, ByteRegister::A);
+    rotate_shift_op<RotateShiftOperation::RRA>(gb, ByteRegister::A);
 }
 
 template<typename Op>
 void rlc(GameboyImpl &gb, Op op)
 {
-    rotate_shift_op<Op, RotateShiftOperation::RLC>(gb, op);
+    rotate_shift_op<RotateShiftOperation::RLC>(gb, op);
 }
 
 template<typename Op>
 void rl(GameboyImpl &gb, Op op)
 {
-    rotate_shift_op<Op, RotateShiftOperation::RL>(gb, op);
+    rotate_shift_op<RotateShiftOperation::RL>(gb, op);
 }
 
 template<typename Op>
 void rrc(GameboyImpl &gb, Op op)
 {
-    rotate_shift_op<Op, RotateShiftOperation::RRC>(gb, op);
+    rotate_shift_op<RotateShiftOperation::RRC>(gb, op);
 }
 
 template<typename Op>
 void rr(GameboyImpl &gb, Op op)
 {
-    rotate_shift_op<Op, RotateShiftOperation::RR>(gb, op);
+    rotate_shift_op<RotateShiftOperation::RR>(gb, op);
 }
 
 template<typename Op>
 void sla(GameboyImpl &gb, Op op)
 {
-    rotate_shift_op<Op, RotateShiftOperation::SLA>(gb, op);
+    rotate_shift_op<RotateShiftOperation::SLA>(gb, op);
 }
 
 template<typename Op>
 void sra(GameboyImpl &gb, Op op)
 {
-    rotate_shift_op<Op, RotateShiftOperation::SRA>(gb, op);
+    rotate_shift_op<RotateShiftOperation::SRA>(gb, op);
 }
 
 template<typename Op>
 void srl(GameboyImpl &gb, Op op)
 {
-    rotate_shift_op<Op, RotateShiftOperation::SRL>(gb, op);
+    rotate_shift_op<RotateShiftOperation::SRL>(gb, op);
 }
 
-template<typename Op, unsigned int b>
+template<unsigned int b, typename Op>
 void bit(GameboyImpl &gb, Op op)
 {
     gb.set(ConditionCode::Z, gb.get(op) & (1 << b));
@@ -357,19 +366,19 @@ void bit(GameboyImpl &gb, Op op)
     gb.set(ConditionCode::H, true);
 }
 
-template<typename Op, unsigned int b>
+template<unsigned int b, typename Op>
 void set(GameboyImpl &gb, Op op)
 {
     gb.set(op, gb.get(op) | (1 << b));
 }
 
-template<typename Op, unsigned int b>
+template<unsigned int b, typename Op>
 void res(GameboyImpl &gb, Op op)
 {
     gb.set(op, gb.get(op) & ~(1 << b));
 }
 
-template<typename Op, ConditionCode cc>
+template<ConditionCode cc, typename Op>
 void jp(GameboyImpl &gb, Op op)
 {
     if (gb.get(cc))
@@ -384,17 +393,17 @@ void jp_hl(GameboyImpl &gb)
 template<ConditionCode cc>
 void jr(GameboyImpl &gb)
 {
-    auto disp = gb.get(Displacement());
+    auto disp = static_cast<int8_t>(gb.get(ByteImmediate()));
     if (gb.get(cc))
         gb.set(WordRegister::PC, static_cast<uint16_t>(gb.get(WordRegister::PC) + disp));
 }
 
-template<typename Op, ConditionCode cc>
+template<ConditionCode cc, typename Op>
 void call(GameboyImpl &gb, Op op)
 {
     auto dest = gb.get(op);
     if (gb.get(cc)) {
-        gb.set(WordPointer<WordRegister, 0, -2>(WordRegister::SP), gb.get(WordRegister::PC));
+        gb.set(word_ptr<0, 2>(WordRegister::SP), gb.get(WordRegister::PC));
         gb.cpu_.set(WordRegister::PC, static_cast<uint16_t>(dest), false);
         gb.set(WordRegister::SP, gb.get(WordRegister::SP) - 2);
     }
@@ -403,28 +412,34 @@ void call(GameboyImpl &gb, Op op)
 template<uint16_t off>
 void rst(GameboyImpl &gb)
 {
-    call<Constant<off>, ConditionCode::UNCONDITIONAL>(gb, Constant<off>());
+    call<ConditionCode::UNCONDITIONAL>(gb, Constant<off>());
 }
 
-template<ConditionCode cc, bool enable_interrupts>
+template<ConditionCode cc, bool enable_interrupts = false>
 void ret(GameboyImpl &gb)
 {
     if (cc != ConditionCode::UNCONDITIONAL)
         gb.cpu_.tick();
 
     if (gb.get(cc))
-        gb.set(WordRegister::PC, gb.get(WordPointer<WordRegister, 2>(WordRegister::SP)));
+        gb.set(WordRegister::PC, gb.get(word_ptr<2>(WordRegister::SP)));
 }
+
+void cb_prefix(GameboyImpl &gb)
+{
 
 }
 
-namespace mjkgb {
+} /* anonymous namespace */
+} /* namespace opcodes */
 
 #ifndef EMIT_LLVM
 void GameboyImpl::run()
 {
-    ld(*this, ByteRegister::A, ByteRegister::B);
-    nop(*this);
+#define X(name, def, is_jump, cycles) auto name = def
+#include "opcode_map.in"
+#undef X
+    inc_BC(*this);
 }
 #endif
 

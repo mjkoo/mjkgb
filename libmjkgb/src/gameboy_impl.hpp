@@ -90,14 +90,35 @@ struct accessor<ConditionCode> {
     value_type get(GameboyImpl &gb, ConditionCode cc) const
     {
         if (cc == ConditionCode::UNCONDITIONAL) return true;
+
+        int flag_index;
+        switch (cc) {
+        case ConditionCode::Z:
+        case ConditionCode::N:
+        case ConditionCode::H:
+        case ConditionCode::C:
+            flag_index = 3 - static_cast<int>(cc) + 4;
+            break;
+        case ConditionCode::NZ:
+            flag_index = 7;
+            break;
+        case ConditionCode::NC:
+            flag_index = 4;
+            break;
+        case ConditionCode::UNCONDITIONAL:
+            return true;
+        }
+
         auto flags = gb.cpu_.get(ByteRegister::F);
-        auto mask = 1 << ((3 - static_cast<int>(cc)) + 4);
-        return (flags & mask) != 0;
+        auto mask = 1 << flag_index;
+        auto value = (flags & mask) != 0;
+
+        return (cc != ConditionCode::NZ && cc != ConditionCode::NC) ? value : !value;
     }
 
     void set(GameboyImpl &gb, ConditionCode cc, value_type value) const
     {
-        if (cc == ConditionCode::UNCONDITIONAL) return;
+        if (static_cast<int>(cc) >= 4) return;
         
         auto flags = gb.cpu_.get(ByteRegister::F);
         auto mask = 1 << ((3 - static_cast<int>(cc)) + 4);
@@ -214,8 +235,9 @@ struct accessor<ByteImmediate> {
 
     value_type get(GameboyImpl &gb, ByteImmediate) const
     {
-        auto imm_ptr = BytePointer<WordRegister, sizeof(value_type)>(WordRegister::PC);
+        auto imm_ptr = byte_ptr(WordRegister::PC);
         auto ret = accessor<decltype(imm_ptr)>().get(gb, imm_ptr);
+        gb.cpu_.set(WordRegister::PC, gb.cpu_.get(WordRegister::PC) + sizeof(value_type));
         return ret;
     }
 
@@ -228,25 +250,13 @@ struct accessor<WordImmediate> {
 
     value_type get(GameboyImpl &gb, WordImmediate) const
     {
-        auto imm_ptr = WordPointer<WordRegister, sizeof(value_type)>(WordRegister::PC);
+        auto imm_ptr = word_ptr(WordRegister::PC);
         auto ret = accessor<decltype(imm_ptr)>().get(gb, imm_ptr);
+        gb.cpu_.set(WordRegister::PC, gb.cpu_.get(WordRegister::PC) + sizeof(value_type));
         return ret;
     }
 
     void set(GameboyImpl &, WordImmediate, value_type) const;
-};
-
-template<>
-struct accessor<Displacement> {
-    using value_type = int8_t;
-
-    value_type get(GameboyImpl &gb, Displacement) const
-    {
-        auto ret = accessor<ByteImmediate>().get(gb, ByteImmediate());
-        return static_cast<value_type>(ret);
-    }
-
-    void set(GameboyImpl &, Displacement, value_type) const;
 };
 
 }

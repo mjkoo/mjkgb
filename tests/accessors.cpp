@@ -86,7 +86,7 @@ TEST_F(AccessorsTest, Ignore) {
 }
 
 TEST_F(AccessorsTest, BytePointer) {
-    auto ptr0 = BytePointer<ByteRegister, 0>(ByteRegister::A);
+    auto ptr0 = byte_ptr(ByteRegister::A);
     EXPECT_EQ(0, gb.get(ptr0));
 
     gb.set(ptr0, 0xde);
@@ -95,7 +95,7 @@ TEST_F(AccessorsTest, BytePointer) {
     gb.set(ptr0, gb.get(ptr0) + 1);
     EXPECT_EQ(0xdf, gb.get(ptr0));
 
-    auto ptr1 = BytePointer<WordRegister, 0>(WordRegister::HL);
+    auto ptr1 = byte_ptr(WordRegister::HL);
     EXPECT_EQ(0, gb.get(ptr1));
 
     gb.set(WordRegister::HL, 0xff00);
@@ -107,14 +107,14 @@ TEST_F(AccessorsTest, BytePointer) {
     gb.set(ptr1, gb.get(ptr1) + 1);
     EXPECT_EQ(0xbf, gb.get(ptr1));
 
-    auto ptr2 = BytePointer<WordRegister, 1>(WordRegister::HL);
+    auto ptr2 = byte_ptr<1>(WordRegister::HL);
     EXPECT_EQ(0xff00, gb.get(WordRegister::HL));
     EXPECT_EQ(0xbf, gb.get(ptr2));
     EXPECT_EQ(0xff01, gb.get(WordRegister::HL));
     EXPECT_EQ(0x0, gb.get(ptr2));
     EXPECT_EQ(0xff02, gb.get(WordRegister::HL));
 
-    auto ptr3 = BytePointer<WordRegister, -1>(WordRegister::HL);
+    auto ptr3 = byte_ptr<-1>(WordRegister::HL);
     EXPECT_EQ(0xff02, gb.get(WordRegister::HL));
     EXPECT_EQ(0x0, gb.get(ptr3));
     EXPECT_EQ(0xff01, gb.get(WordRegister::HL));
@@ -124,7 +124,7 @@ TEST_F(AccessorsTest, BytePointer) {
 }
 
 TEST_F(AccessorsTest, WordPointer) {
-    auto ptr0 = WordPointer<ByteRegister, 0>(ByteRegister::A);
+    auto ptr0 = word_ptr(ByteRegister::A);
     EXPECT_EQ(0, gb.get(ptr0));
 
     gb.set(ptr0, 0xdead);
@@ -133,7 +133,7 @@ TEST_F(AccessorsTest, WordPointer) {
     gb.set(ptr0, gb.get(ptr0) + 1);
     EXPECT_EQ(0xdeae, gb.get(ptr0));
 
-    auto ptr1 = WordPointer<WordRegister, 0>(WordRegister::HL);
+    auto ptr1 = word_ptr(WordRegister::HL);
     EXPECT_EQ(0, gb.get(ptr1));
 
     gb.set(WordRegister::HL, 0xff00);
@@ -145,14 +145,14 @@ TEST_F(AccessorsTest, WordPointer) {
     gb.set(ptr1, gb.get(ptr1) + 1);
     EXPECT_EQ(0xbef0, gb.get(ptr1));
 
-    auto ptr2 = WordPointer<WordRegister, 1>(WordRegister::HL);
+    auto ptr2 = word_ptr<1>(WordRegister::HL);
     EXPECT_EQ(0xff00, gb.get(WordRegister::HL));
     EXPECT_EQ(0xbef0, gb.get(ptr2));
     EXPECT_EQ(0xff01, gb.get(WordRegister::HL));
     EXPECT_EQ(0xbe, gb.get(ptr2));
     EXPECT_EQ(0xff02, gb.get(WordRegister::HL));
 
-    auto ptr3 = WordPointer<WordRegister, -1>(WordRegister::HL);
+    auto ptr3 = word_ptr<-1>(WordRegister::HL);
     EXPECT_EQ(0xff02, gb.get(WordRegister::HL));
     EXPECT_EQ(0x0, gb.get(ptr3));
     EXPECT_EQ(0xff01, gb.get(WordRegister::HL));
@@ -167,7 +167,7 @@ TEST_F(AccessorsTest, ByteImmediate) {
     EXPECT_EQ(1, gb.get(WordRegister::PC));
 
     gb.set(WordRegister::HL, 1);
-    gb.set(BytePointer<WordRegister>(WordRegister::HL), 0xde);
+    gb.set(byte_ptr(WordRegister::HL), 0xde);
     EXPECT_EQ(0xde, gb.get(ByteImmediate()));
     EXPECT_EQ(2, gb.get(WordRegister::PC));
 }
@@ -178,25 +178,9 @@ TEST_F(AccessorsTest, WordImmediate) {
     EXPECT_EQ(2, gb.get(WordRegister::PC));
 
     gb.set(WordRegister::HL, 2);
-    gb.set(WordPointer<WordRegister>(WordRegister::HL), 0xdead);
+    gb.set(word_ptr(WordRegister::HL), 0xdead);
     EXPECT_EQ(0xdead, gb.get(WordImmediate()));
     EXPECT_EQ(4, gb.get(WordRegister::PC));
-}
-
-TEST_F(AccessorsTest, Displacement) {
-    EXPECT_EQ(0, gb.get(WordRegister::PC));
-    EXPECT_EQ(0, gb.get(Displacement()));
-    EXPECT_EQ(1, gb.get(WordRegister::PC));
-
-    gb.set(WordRegister::HL, 1);
-    gb.set(BytePointer<WordRegister>(WordRegister::HL), 0x1);
-    EXPECT_EQ(0x1, gb.get(Displacement()));
-    EXPECT_EQ(2, gb.get(WordRegister::PC));
-
-    gb.set(WordRegister::HL, 2);
-    gb.set(BytePointer<WordRegister>(WordRegister::HL), 0xff);
-    EXPECT_EQ(-0x1, gb.get(Displacement()));
-    EXPECT_EQ(3, gb.get(WordRegister::PC));
 }
 
 }

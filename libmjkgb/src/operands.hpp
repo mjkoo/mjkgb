@@ -12,7 +12,7 @@ enum class WordRegister {
 };
 
 enum class ConditionCode {
-    Z, N, H, C, UNCONDITIONAL
+    Z, N, H, C, NZ, NC, UNCONDITIONAL
 };
 
 template<int value> struct Constant { };
@@ -24,7 +24,6 @@ template<typename T> struct Ignore {
     { }
 };
 
-
 template<typename T, int inc = 0, int off = 0>
 struct BytePointer {
     T value;
@@ -32,6 +31,12 @@ struct BytePointer {
       : value(value)
     { }
 };
+
+template<int inc = 0, int off = 0, typename T>
+BytePointer<T, inc, off> byte_ptr(T value)
+{
+    return BytePointer<T, inc, off>(value);
+}
 
 template<typename T, int inc = 0, int off = 0>
 struct WordPointer {
@@ -41,9 +46,14 @@ struct WordPointer {
     { }
 };
 
+template<int inc = 0, int off = 0, typename T>
+WordPointer<T, inc, off> word_ptr(T value)
+{
+    return WordPointer<T, inc, off>(value);
+}
+
 struct ByteImmediate { };
 struct WordImmediate { };
-struct Displacement { };
 
 }
 
