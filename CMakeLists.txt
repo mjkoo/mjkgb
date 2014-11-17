@@ -17,6 +17,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         "-Wno-shadow"
         "-Wno-unused-function"
         "-Wno-unused-parameter"
+        "-Wno-unused-label"
         "-Wno-unused-value"
         "-Wno-unused-variable"
         "-Wno-global-constructors"

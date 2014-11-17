@@ -22,22 +22,22 @@ void undefined(GameboyImpl &gb)
 
 void stop(GameboyImpl &gb)
 {
-    gb.cpu_.stop();
+    gb.stop();
 }
 
 void halt(GameboyImpl &gb)
 {
-    gb.cpu_.halt();
+    gb.halt();
 }
 
 void ei(GameboyImpl &gb)
 {
-    gb.cpu_.enable_interrupts();
+    gb.enable_interrupts();
 }
 
 void di(GameboyImpl &gb)
 {
-    gb.cpu_.disable_interrupts();
+    gb.disable_interrupts();
 }
 
 template<typename Dst, typename Src>
@@ -48,7 +48,7 @@ void ld(GameboyImpl &gb, Dst dst, Src src)
 
 void ld_hl_sp_n(GameboyImpl &gb)
 {
-    auto disp = static_cast<int8_t>(gb.get(ByteImmediate()));
+    auto disp = static_cast<int8_t>(gb.get(ByteImmediate{}));
     gb.set(WordRegister::HL, static_cast<uint16_t>(gb.get(WordRegister::SP) + disp));
 }
 
@@ -90,7 +90,7 @@ void add(GameboyImpl &gb, Dst dst, Src src)
 
 void add_sp_n(GameboyImpl &gb)
 {
-    add(gb, WordRegister::SP, ByteImmediate());
+    add(gb, WordRegister::SP, ByteImmediate{});
     gb.set(ConditionCode::Z, false);
     gb.cpu_.tick();
 }
@@ -172,7 +172,7 @@ void bitwise_op(GameboyImpl &gb, Op op)
         break;
     }
 
-    gb.set(op, result);
+    gb.set(ByteRegister::A, result);
     gb.set(ByteRegister::F, kind == BitwiseOperation::AND ? 0x20 : 0x00);
     gb.set(ConditionCode::Z, result);
 }
@@ -400,7 +400,7 @@ void jp_hl(GameboyImpl &gb)
 template<ConditionCode cc>
 void jr(GameboyImpl &gb)
 {
-    auto disp = static_cast<int8_t>(gb.get(ByteImmediate()));
+    auto disp = static_cast<int8_t>(gb.get(ByteImmediate{}));
     if (gb.get(cc))
         gb.set(WordRegister::PC, static_cast<uint16_t>(gb.get(WordRegister::PC) + disp));
 }
@@ -432,7 +432,7 @@ void ret(GameboyImpl &gb)
         gb.set(WordRegister::PC, gb.get(word_ptr<2>(WordRegister::SP)));
 }
 
-void cb_prefix(GameboyImpl &gb);
+void cb_prefix(GameboyImpl &);
 
 } /* anonymous namespace */
 } /* namespace opcodes */
@@ -453,7 +453,8 @@ void GameboyImpl::run()
 #undef X
     };
 #define DISPATCH() do {                                     \
-    opcode = get(ByteImmediate());                          \
+    if (stopped()) return;                               \
+    opcode = get(ByteImmediate{});                          \
     goto *dispatch_table[opcode];                           \
 } while (false);
 
@@ -480,7 +481,7 @@ void cb_prefix(GameboyImpl &gb)
 #undef X
     };
 
-    auto opcode = gb.get(ByteImmediate());
+    auto opcode = gb.get(ByteImmediate{});
     goto *dispatch_table[opcode];
 
 #define X(name, def, is_jump, cycles) do {                  \
@@ -499,39 +500,24 @@ void cb_prefix(GameboyImpl &gb)
 
 extern "C" {
 #define X(name, def, is_jump, cycles)                       \
-void name(GameboyImpl &gb)                              \
-{                                                       \
-    def(gb);                                            \
+__attribute__((used))                                       \
+void name(GameboyImpl &gb)                                  \
+{                                                           \
+    def(gb);                                                \
 }
 #include "opcode_map.in"
 #include "cb_opcode_map.in"
 #undef X
 }
-
-using opcode_func_type = void (*)(GameboyImpl &);
-#define X(name, def, is_jump, cycles) name,
-__attribute__((used))
-const opcode_func_type opcode_funcs[] = {
-#include "opcode_map.in"
-};
-
-__attribute__((used))
-const opcode_func_type cb_opcode_funcs[] = {
-#include "cb_opcode_map.in"
-};
-#undef X
 
 namespace opcodes {
 namespace {
 
-void cb_prefix(GameboyImpl &gb)
-{
-    auto opcode = gb.get(ByteImmediate());
-    cb_opcode_funcs[opcode](gb);
-}
+void cb_prefix(GameboyImpl &)
+{ }
 
-} /* anonymous namespace */
-} /* namespace opcodes */
+}
+}
 
 #endif
 

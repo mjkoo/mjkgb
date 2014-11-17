@@ -2,9 +2,9 @@
 
 #include "gameboy_impl.hpp"
 
-using namespace mjkgb;
-
 namespace {
+
+using namespace mjkgb;
 
 class AccessorsTest : public testing::Test {
 protected:

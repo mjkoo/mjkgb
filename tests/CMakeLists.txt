@@ -8,6 +8,7 @@ include_directories(
 )
 add_executable(mjkgb_test
     ./accessors.cpp
+    ./opcodes.cpp
 
     ./main.cpp
 )

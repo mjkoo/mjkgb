@@ -19,37 +19,37 @@ template<int value> struct Constant { };
 
 template<typename T> struct Ignore {
     T value;
-    explicit Ignore(T value)
-      : value(value)
+    explicit Ignore(T v)
+      : value(v)
     { }
 };
 
 template<typename T, int inc = 0, int off = 0>
 struct BytePointer {
     T value;
-    explicit BytePointer(T value)
-      : value(value)
+    explicit BytePointer(T v)
+      : value(v)
     { }
 };
 
 template<int inc = 0, int off = 0, typename T>
 BytePointer<T, inc, off> byte_ptr(T value)
 {
-    return BytePointer<T, inc, off>(value);
+    return BytePointer<T, inc, off>{value};
 }
 
 template<typename T, int inc = 0, int off = 0>
 struct WordPointer {
     T value;
-    explicit WordPointer(T value)
-      : value(value)
+    explicit WordPointer(T v)
+      : value(v)
     { }
 };
 
 template<int inc = 0, int off = 0, typename T>
 WordPointer<T, inc, off> word_ptr(T value)
 {
-    return WordPointer<T, inc, off>(value);
+    return WordPointer<T, inc, off>{value};
 }
 
 struct ByteImmediate { };

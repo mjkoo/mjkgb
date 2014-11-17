@@ -2,6 +2,7 @@
 #define GAMEBOY_IMPL_HPP_
 
 #include <cstdint>
+#include <iosfwd>
 #include <string>
 
 #include "mjkgb.hpp"
@@ -18,21 +19,57 @@ template<typename T> struct accessor;
  * Gameboy::impl public. Use inheritance to work around this issue.
  */
 struct GameboyImpl {
-    GameboyImpl();
+    GameboyImpl()
+      : cpu_(),
+        mmu_()
+    { }
 
     template<typename T>
     typename accessor<T>::value_type get(T operand)
     {
-        return accessor<T>().get(*this, operand);
+        return accessor<T>{}.get(*this, operand);
     }
 
     template<typename T>
     void set(T operand, typename accessor<T>::value_type value)
     {
-        accessor<T>().set(*this, operand, value);
+        accessor<T>{}.set(*this, operand, value);
     }
 
-    void load(const std::string &filename);
+    inline void tick()
+    {
+        cpu_.tick();
+    }
+
+    inline void stop()
+    {
+        cpu_.stop();
+    }
+
+    inline bool stopped() const
+    {
+        return cpu_.stopped();
+    }
+
+    inline void halt()
+    {
+        cpu_.halt();
+    }
+
+    inline void enable_interrupts()
+    {
+        cpu_.enable_interrupts();
+    }
+
+    inline void disable_interrupts()
+    {
+        cpu_.disable_interrupts();
+    }
+
+    inline void load(std::istream &is)
+    {
+        mmu_.load(is);
+    }
 
     void run();
 
@@ -168,7 +205,7 @@ struct accessor<BytePointer<T, inc, off>> {
         address += off;
 
         auto ret = gb.mmu_.get(address);
-        gb.cpu_.tick();
+        gb.tick();
 
         if (inc)
             gb.set(ptr.value, static_cast<operand_type>(gb.get(ptr.value) + inc));
@@ -184,7 +221,7 @@ struct accessor<BytePointer<T, inc, off>> {
         address += off;
 
         gb.mmu_.set(address, value);
-        gb.cpu_.tick();
+        gb.tick();
 
         if (inc)
             gb.set(ptr.value, static_cast<operand_type>(gb.get(ptr.value) + inc));
@@ -202,9 +239,9 @@ struct accessor<WordPointer<T, inc, off>> {
         address += off;
 
         auto ret = static_cast<value_type>(gb.mmu_.get(address));
-        gb.cpu_.tick();
+        gb.tick();
         ret |= (gb.mmu_.get(address + 1) << 8);
-        gb.cpu_.tick();
+        gb.tick();
 
         if (inc)
             gb.set(ptr.value, static_cast<operand_type>(gb.get(ptr.value) + inc));
@@ -220,9 +257,9 @@ struct accessor<WordPointer<T, inc, off>> {
         address += off;
 
         gb.mmu_.set(address, value & 0xff);
-        gb.cpu_.tick();
+        gb.tick();
         gb.mmu_.set(address + 1, (value >> 8) & 0xff);
-        gb.cpu_.tick();
+        gb.tick();
 
         if (inc)
             gb.set(ptr.value, static_cast<operand_type>(gb.get(ptr.value) + inc));
