@@ -361,7 +361,12 @@ void srl(GameboyImpl &gb, Op op)
 template<unsigned int b, typename Op>
 void bit(GameboyImpl &gb, Op op)
 {
-    gb.set(ConditionCode::Z, gb.get(op) & (1 << b));
+    auto value = gb.get(op);
+
+    // This is a no-op for byte registers, causes a tick for (HL)
+    gb.set(op, value);
+
+    gb.set(ConditionCode::Z, value & (1 << b));
     gb.set(ConditionCode::N, false);
     gb.set(ConditionCode::H, true);
 }
@@ -436,10 +441,9 @@ void cb_prefix(GameboyImpl &gb)
 #ifndef EMIT_LLVM
 void GameboyImpl::run()
 {
-#define X(name, def, is_jump, cycles) auto name = def
+#define X(name, def, is_jump, cycles) do { auto name = def; name(*this); } while (0)
 #include "opcode_map.in"
 #undef X
-    inc_BC(*this);
 }
 #endif
 

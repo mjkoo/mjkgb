@@ -1,0 +1,295 @@
+// vim: ft=cpp
+/* Format: X(label/function name, definition, is jump, cycles)
+ *
+ * Cycle counts here don't count time taken to fetch 0xcb prefix, this gets
+ * handled in the top level cb_prefix handler.
+ */
+
+/* 0x00 - 0x0f */
+X(rlc_B,        [](GameboyImpl &gb) { opcodes::rlc(gb, ByteRegister::B); },                                 false, 4);
+X(rlc_C,        [](GameboyImpl &gb) { opcodes::rlc(gb, ByteRegister::C); },                                 false, 4);
+X(rlc_D,        [](GameboyImpl &gb) { opcodes::rlc(gb, ByteRegister::D); },                                 false, 4);
+X(rlc_E,        [](GameboyImpl &gb) { opcodes::rlc(gb, ByteRegister::E); },                                 false, 4);
+X(rlc_H,        [](GameboyImpl &gb) { opcodes::rlc(gb, ByteRegister::H); },                                 false, 4);
+X(rlc_L,        [](GameboyImpl &gb) { opcodes::rlc(gb, ByteRegister::L); },                                 false, 4);
+X(rlc_pHL,      [](GameboyImpl &gb) { opcodes::rlc(gb, byte_ptr(WordRegister::HL)); },                      false, 12);
+X(rlc_A,        [](GameboyImpl &gb) { opcodes::rlc(gb, ByteRegister::A); },                                 false, 4);
+X(rrc_B,        [](GameboyImpl &gb) { opcodes::rrc(gb, ByteRegister::B); },                                 false, 4);
+X(rrc_C,        [](GameboyImpl &gb) { opcodes::rrc(gb, ByteRegister::C); },                                 false, 4);
+X(rrc_D,        [](GameboyImpl &gb) { opcodes::rrc(gb, ByteRegister::D); },                                 false, 4);
+X(rrc_E,        [](GameboyImpl &gb) { opcodes::rrc(gb, ByteRegister::E); },                                 false, 4);
+X(rrc_H,        [](GameboyImpl &gb) { opcodes::rrc(gb, ByteRegister::H); },                                 false, 4);
+X(rrc_L,        [](GameboyImpl &gb) { opcodes::rrc(gb, ByteRegister::L); },                                 false, 4);
+X(rrc_pHL,      [](GameboyImpl &gb) { opcodes::rrc(gb, byte_ptr(WordRegister::HL)); },                      false, 12);
+X(rrc_A,        [](GameboyImpl &gb) { opcodes::rrc(gb, ByteRegister::A); },                                 false, 4);
+
+/* 0x10 - 0x1f */
+X(rl_B,         [](GameboyImpl &gb) { opcodes::rl(gb, ByteRegister::B); },                                  false, 4);
+X(rl_C,         [](GameboyImpl &gb) { opcodes::rl(gb, ByteRegister::C); },                                  false, 4);
+X(rl_D,         [](GameboyImpl &gb) { opcodes::rl(gb, ByteRegister::D); },                                  false, 4);
+X(rl_E,         [](GameboyImpl &gb) { opcodes::rl(gb, ByteRegister::E); },                                  false, 4);
+X(rl_H,         [](GameboyImpl &gb) { opcodes::rl(gb, ByteRegister::H); },                                  false, 4);
+X(rl_L,         [](GameboyImpl &gb) { opcodes::rl(gb, ByteRegister::L); },                                  false, 4);
+X(rl_pHL,       [](GameboyImpl &gb) { opcodes::rl(gb, byte_ptr(WordRegister::HL)); },                       false, 12);
+X(rl_A,         [](GameboyImpl &gb) { opcodes::rl(gb, ByteRegister::A); },                                  false, 4);
+X(rr_B,         [](GameboyImpl &gb) { opcodes::rr(gb, ByteRegister::B); },                                  false, 4);
+X(rr_C,         [](GameboyImpl &gb) { opcodes::rr(gb, ByteRegister::C); },                                  false, 4);
+X(rr_D,         [](GameboyImpl &gb) { opcodes::rr(gb, ByteRegister::D); },                                  false, 4);
+X(rr_E,         [](GameboyImpl &gb) { opcodes::rr(gb, ByteRegister::E); },                                  false, 4);
+X(rr_H,         [](GameboyImpl &gb) { opcodes::rr(gb, ByteRegister::H); },                                  false, 4);
+X(rr_L,         [](GameboyImpl &gb) { opcodes::rr(gb, ByteRegister::L); },                                  false, 4);
+X(rr_pHL,       [](GameboyImpl &gb) { opcodes::rr(gb, byte_ptr(WordRegister::HL)); },                       false, 12);
+X(rr_A,         [](GameboyImpl &gb) { opcodes::rr(gb, ByteRegister::A); },                                  false, 4);
+
+/* 0x20 - 0x2f */
+X(sla_B,        [](GameboyImpl &gb) { opcodes::sla(gb, ByteRegister::B); },                                 false, 4);
+X(sla_C,        [](GameboyImpl &gb) { opcodes::sla(gb, ByteRegister::C); },                                 false, 4);
+X(sla_D,        [](GameboyImpl &gb) { opcodes::sla(gb, ByteRegister::D); },                                 false, 4);
+X(sla_E,        [](GameboyImpl &gb) { opcodes::sla(gb, ByteRegister::E); },                                 false, 4);
+X(sla_H,        [](GameboyImpl &gb) { opcodes::sla(gb, ByteRegister::H); },                                 false, 4);
+X(sla_L,        [](GameboyImpl &gb) { opcodes::sla(gb, ByteRegister::L); },                                 false, 4);
+X(sla_pHL,      [](GameboyImpl &gb) { opcodes::sla(gb, byte_ptr(WordRegister::HL)); },                      false, 12);
+X(sla_A,        [](GameboyImpl &gb) { opcodes::sla(gb, ByteRegister::A); },                                 false, 4);
+X(sra_B,        [](GameboyImpl &gb) { opcodes::sra(gb, ByteRegister::B); },                                 false, 4);
+X(sra_C,        [](GameboyImpl &gb) { opcodes::sra(gb, ByteRegister::C); },                                 false, 4);
+X(sra_D,        [](GameboyImpl &gb) { opcodes::sra(gb, ByteRegister::D); },                                 false, 4);
+X(sra_E,        [](GameboyImpl &gb) { opcodes::sra(gb, ByteRegister::E); },                                 false, 4);
+X(sra_H,        [](GameboyImpl &gb) { opcodes::sra(gb, ByteRegister::H); },                                 false, 4);
+X(sra_L,        [](GameboyImpl &gb) { opcodes::sra(gb, ByteRegister::L); },                                 false, 4);
+X(sra_pHL,      [](GameboyImpl &gb) { opcodes::sra(gb, byte_ptr(WordRegister::HL)); },                      false, 12);
+X(sra_A,        [](GameboyImpl &gb) { opcodes::sra(gb, ByteRegister::A); },                                 false, 4);
+
+/* 0x30 - 0x3f */
+X(swap_B,       [](GameboyImpl &gb) { opcodes::swap(gb, ByteRegister::B); },                                false, 4);
+X(swap_C,       [](GameboyImpl &gb) { opcodes::swap(gb, ByteRegister::C); },                                false, 4);
+X(swap_D,       [](GameboyImpl &gb) { opcodes::swap(gb, ByteRegister::D); },                                false, 4);
+X(swap_E,       [](GameboyImpl &gb) { opcodes::swap(gb, ByteRegister::E); },                                false, 4);
+X(swap_H,       [](GameboyImpl &gb) { opcodes::swap(gb, ByteRegister::H); },                                false, 4);
+X(swap_L,       [](GameboyImpl &gb) { opcodes::swap(gb, ByteRegister::L); },                                false, 4);
+X(swap_pHL,     [](GameboyImpl &gb) { opcodes::swap(gb, byte_ptr(WordRegister::HL)); },                     false, 12);
+X(swap_A,       [](GameboyImpl &gb) { opcodes::swap(gb, ByteRegister::A); },                                false, 4);
+X(srl_B,        [](GameboyImpl &gb) { opcodes::srl(gb, ByteRegister::B); },                                 false, 4);
+X(srl_C,        [](GameboyImpl &gb) { opcodes::srl(gb, ByteRegister::C); },                                 false, 4);
+X(srl_D,        [](GameboyImpl &gb) { opcodes::srl(gb, ByteRegister::D); },                                 false, 4);
+X(srl_E,        [](GameboyImpl &gb) { opcodes::srl(gb, ByteRegister::E); },                                 false, 4);
+X(srl_H,        [](GameboyImpl &gb) { opcodes::srl(gb, ByteRegister::H); },                                 false, 4);
+X(srl_L,        [](GameboyImpl &gb) { opcodes::srl(gb, ByteRegister::L); },                                 false, 4);
+X(srl_pHL,      [](GameboyImpl &gb) { opcodes::srl(gb, byte_ptr(WordRegister::HL)); },                      false, 12);
+X(srl_A,        [](GameboyImpl &gb) { opcodes::srl(gb, ByteRegister::A); },                                 false, 4);
+
+/* 0x40 - 0x4f */
+X(bit_0_B,      [](GameboyImpl &gb) { opcodes::bit<0>(gb, ByteRegister::B); },                              false, 4);
+X(bit_0_C,      [](GameboyImpl &gb) { opcodes::bit<0>(gb, ByteRegister::C); },                              false, 4);
+X(bit_0_D,      [](GameboyImpl &gb) { opcodes::bit<0>(gb, ByteRegister::D); },                              false, 4);
+X(bit_0_E,      [](GameboyImpl &gb) { opcodes::bit<0>(gb, ByteRegister::E); },                              false, 4);
+X(bit_0_H,      [](GameboyImpl &gb) { opcodes::bit<0>(gb, ByteRegister::H); },                              false, 4);
+X(bit_0_L,      [](GameboyImpl &gb) { opcodes::bit<0>(gb, ByteRegister::L); },                              false, 4);
+X(bit_0_pHL,    [](GameboyImpl &gb) { opcodes::bit<0>(gb, byte_ptr(WordRegister::HL)); },                   false, 12);
+X(bit_0_A,      [](GameboyImpl &gb) { opcodes::bit<0>(gb, ByteRegister::A); },                              false, 4);
+X(bit_1_B,      [](GameboyImpl &gb) { opcodes::bit<1>(gb, ByteRegister::B); },                              false, 4);
+X(bit_1_C,      [](GameboyImpl &gb) { opcodes::bit<1>(gb, ByteRegister::C); },                              false, 4);
+X(bit_1_D,      [](GameboyImpl &gb) { opcodes::bit<1>(gb, ByteRegister::D); },                              false, 4);
+X(bit_1_E,      [](GameboyImpl &gb) { opcodes::bit<1>(gb, ByteRegister::E); },                              false, 4);
+X(bit_1_H,      [](GameboyImpl &gb) { opcodes::bit<1>(gb, ByteRegister::H); },                              false, 4);
+X(bit_1_L,      [](GameboyImpl &gb) { opcodes::bit<1>(gb, ByteRegister::L); },                              false, 4);
+X(bit_1_pHL,    [](GameboyImpl &gb) { opcodes::bit<1>(gb, byte_ptr(WordRegister::HL)); },                   false, 12);
+X(bit_1_A,      [](GameboyImpl &gb) { opcodes::bit<1>(gb, ByteRegister::A); },                              false, 4);
+
+/* 0x50 - 0x5f */
+X(bit_2_B,      [](GameboyImpl &gb) { opcodes::bit<2>(gb, ByteRegister::B); },                              false, 4);
+X(bit_2_C,      [](GameboyImpl &gb) { opcodes::bit<2>(gb, ByteRegister::C); },                              false, 4);
+X(bit_2_D,      [](GameboyImpl &gb) { opcodes::bit<2>(gb, ByteRegister::D); },                              false, 4);
+X(bit_2_E,      [](GameboyImpl &gb) { opcodes::bit<2>(gb, ByteRegister::E); },                              false, 4);
+X(bit_2_H,      [](GameboyImpl &gb) { opcodes::bit<2>(gb, ByteRegister::H); },                              false, 4);
+X(bit_2_L,      [](GameboyImpl &gb) { opcodes::bit<2>(gb, ByteRegister::L); },                              false, 4);
+X(bit_2_pHL,    [](GameboyImpl &gb) { opcodes::bit<2>(gb, byte_ptr(WordRegister::HL)); },                   false, 12);
+X(bit_2_A,      [](GameboyImpl &gb) { opcodes::bit<2>(gb, ByteRegister::A); },                              false, 4);
+X(bit_3_B,      [](GameboyImpl &gb) { opcodes::bit<3>(gb, ByteRegister::B); },                              false, 4);
+X(bit_3_C,      [](GameboyImpl &gb) { opcodes::bit<3>(gb, ByteRegister::C); },                              false, 4);
+X(bit_3_D,      [](GameboyImpl &gb) { opcodes::bit<3>(gb, ByteRegister::D); },                              false, 4);
+X(bit_3_E,      [](GameboyImpl &gb) { opcodes::bit<3>(gb, ByteRegister::E); },                              false, 4);
+X(bit_3_H,      [](GameboyImpl &gb) { opcodes::bit<3>(gb, ByteRegister::H); },                              false, 4);
+X(bit_3_L,      [](GameboyImpl &gb) { opcodes::bit<3>(gb, ByteRegister::L); },                              false, 4);
+X(bit_3_pHL,    [](GameboyImpl &gb) { opcodes::bit<3>(gb, byte_ptr(WordRegister::HL)); },                   false, 12);
+X(bit_3_A,      [](GameboyImpl &gb) { opcodes::bit<3>(gb, ByteRegister::A); },                              false, 4);
+
+/* 0x60 - 0x6f */
+X(bit_4_B,      [](GameboyImpl &gb) { opcodes::bit<4>(gb, ByteRegister::B); },                              false, 4);
+X(bit_4_C,      [](GameboyImpl &gb) { opcodes::bit<4>(gb, ByteRegister::C); },                              false, 4);
+X(bit_4_D,      [](GameboyImpl &gb) { opcodes::bit<4>(gb, ByteRegister::D); },                              false, 4);
+X(bit_4_E,      [](GameboyImpl &gb) { opcodes::bit<4>(gb, ByteRegister::E); },                              false, 4);
+X(bit_4_H,      [](GameboyImpl &gb) { opcodes::bit<4>(gb, ByteRegister::H); },                              false, 4);
+X(bit_4_L,      [](GameboyImpl &gb) { opcodes::bit<4>(gb, ByteRegister::L); },                              false, 4);
+X(bit_4_pHL,    [](GameboyImpl &gb) { opcodes::bit<4>(gb, byte_ptr(WordRegister::HL)); },                   false, 12);
+X(bit_4_A,      [](GameboyImpl &gb) { opcodes::bit<4>(gb, ByteRegister::A); },                              false, 4);
+X(bit_5_B,      [](GameboyImpl &gb) { opcodes::bit<5>(gb, ByteRegister::B); },                              false, 4);
+X(bit_5_C,      [](GameboyImpl &gb) { opcodes::bit<5>(gb, ByteRegister::C); },                              false, 4);
+X(bit_5_D,      [](GameboyImpl &gb) { opcodes::bit<5>(gb, ByteRegister::D); },                              false, 4);
+X(bit_5_E,      [](GameboyImpl &gb) { opcodes::bit<5>(gb, ByteRegister::E); },                              false, 4);
+X(bit_5_H,      [](GameboyImpl &gb) { opcodes::bit<5>(gb, ByteRegister::H); },                              false, 4);
+X(bit_5_L,      [](GameboyImpl &gb) { opcodes::bit<5>(gb, ByteRegister::L); },                              false, 4);
+X(bit_5_pHL,    [](GameboyImpl &gb) { opcodes::bit<5>(gb, byte_ptr(WordRegister::HL)); },                   false, 12);
+X(bit_5_A,      [](GameboyImpl &gb) { opcodes::bit<5>(gb, ByteRegister::A); },                              false, 4);
+
+/* 0x70 - 0x7f */
+X(bit_6_B,      [](GameboyImpl &gb) { opcodes::bit<6>(gb, ByteRegister::B); },                              false, 4);
+X(bit_6_C,      [](GameboyImpl &gb) { opcodes::bit<6>(gb, ByteRegister::C); },                              false, 4);
+X(bit_6_D,      [](GameboyImpl &gb) { opcodes::bit<6>(gb, ByteRegister::D); },                              false, 4);
+X(bit_6_E,      [](GameboyImpl &gb) { opcodes::bit<6>(gb, ByteRegister::E); },                              false, 4);
+X(bit_6_H,      [](GameboyImpl &gb) { opcodes::bit<6>(gb, ByteRegister::H); },                              false, 4);
+X(bit_6_L,      [](GameboyImpl &gb) { opcodes::bit<6>(gb, ByteRegister::L); },                              false, 4);
+X(bit_6_pHL,    [](GameboyImpl &gb) { opcodes::bit<6>(gb, byte_ptr(WordRegister::HL)); },                   false, 12);
+X(bit_6_A,      [](GameboyImpl &gb) { opcodes::bit<6>(gb, ByteRegister::A); },                              false, 4);
+X(bit_7_B,      [](GameboyImpl &gb) { opcodes::bit<7>(gb, ByteRegister::B); },                              false, 4);
+X(bit_7_C,      [](GameboyImpl &gb) { opcodes::bit<7>(gb, ByteRegister::C); },                              false, 4);
+X(bit_7_D,      [](GameboyImpl &gb) { opcodes::bit<7>(gb, ByteRegister::D); },                              false, 4);
+X(bit_7_E,      [](GameboyImpl &gb) { opcodes::bit<7>(gb, ByteRegister::E); },                              false, 4);
+X(bit_7_H,      [](GameboyImpl &gb) { opcodes::bit<7>(gb, ByteRegister::H); },                              false, 4);
+X(bit_7_L,      [](GameboyImpl &gb) { opcodes::bit<7>(gb, ByteRegister::L); },                              false, 4);
+X(bit_7_pHL,    [](GameboyImpl &gb) { opcodes::bit<7>(gb, byte_ptr(WordRegister::HL)); },                   false, 12);
+X(bit_7_A,      [](GameboyImpl &gb) { opcodes::bit<7>(gb, ByteRegister::A); },                              false, 4);
+
+/* 0x80 - 0x8f */
+X(res_0_B,      [](GameboyImpl &gb) { opcodes::res<0>(gb, ByteRegister::B); },                              false, 4);
+X(res_0_C,      [](GameboyImpl &gb) { opcodes::res<0>(gb, ByteRegister::C); },                              false, 4);
+X(res_0_D,      [](GameboyImpl &gb) { opcodes::res<0>(gb, ByteRegister::D); },                              false, 4);
+X(res_0_E,      [](GameboyImpl &gb) { opcodes::res<0>(gb, ByteRegister::E); },                              false, 4);
+X(res_0_H,      [](GameboyImpl &gb) { opcodes::res<0>(gb, ByteRegister::H); },                              false, 4);
+X(res_0_L,      [](GameboyImpl &gb) { opcodes::res<0>(gb, ByteRegister::L); },                              false, 4);
+X(res_0_pHL,    [](GameboyImpl &gb) { opcodes::res<0>(gb, byte_ptr(WordRegister::HL)); },                   false, 12);
+X(res_0_A,      [](GameboyImpl &gb) { opcodes::res<0>(gb, ByteRegister::A); },                              false, 4);
+X(res_1_B,      [](GameboyImpl &gb) { opcodes::res<1>(gb, ByteRegister::B); },                              false, 4);
+X(res_1_C,      [](GameboyImpl &gb) { opcodes::res<1>(gb, ByteRegister::C); },                              false, 4);
+X(res_1_D,      [](GameboyImpl &gb) { opcodes::res<1>(gb, ByteRegister::D); },                              false, 4);
+X(res_1_E,      [](GameboyImpl &gb) { opcodes::res<1>(gb, ByteRegister::E); },                              false, 4);
+X(res_1_H,      [](GameboyImpl &gb) { opcodes::res<1>(gb, ByteRegister::H); },                              false, 4);
+X(res_1_L,      [](GameboyImpl &gb) { opcodes::res<1>(gb, ByteRegister::L); },                              false, 4);
+X(res_1_pHL,    [](GameboyImpl &gb) { opcodes::res<1>(gb, byte_ptr(WordRegister::HL)); },                   false, 12);
+X(res_1_A,      [](GameboyImpl &gb) { opcodes::res<1>(gb, ByteRegister::A); },                              false, 4);
+
+/* 0x90 - 0x9f */
+X(res_2_B,      [](GameboyImpl &gb) { opcodes::res<2>(gb, ByteRegister::B); },                              false, 4);
+X(res_2_C,      [](GameboyImpl &gb) { opcodes::res<2>(gb, ByteRegister::C); },                              false, 4);
+X(res_2_D,      [](GameboyImpl &gb) { opcodes::res<2>(gb, ByteRegister::D); },                              false, 4);
+X(res_2_E,      [](GameboyImpl &gb) { opcodes::res<2>(gb, ByteRegister::E); },                              false, 4);
+X(res_2_H,      [](GameboyImpl &gb) { opcodes::res<2>(gb, ByteRegister::H); },                              false, 4);
+X(res_2_L,      [](GameboyImpl &gb) { opcodes::res<2>(gb, ByteRegister::L); },                              false, 4);
+X(res_2_pHL,    [](GameboyImpl &gb) { opcodes::res<2>(gb, byte_ptr(WordRegister::HL)); },                   false, 12);
+X(res_2_A,      [](GameboyImpl &gb) { opcodes::res<2>(gb, ByteRegister::A); },                              false, 4);
+X(res_3_B,      [](GameboyImpl &gb) { opcodes::res<3>(gb, ByteRegister::B); },                              false, 4);
+X(res_3_C,      [](GameboyImpl &gb) { opcodes::res<3>(gb, ByteRegister::C); },                              false, 4);
+X(res_3_D,      [](GameboyImpl &gb) { opcodes::res<3>(gb, ByteRegister::D); },                              false, 4);
+X(res_3_E,      [](GameboyImpl &gb) { opcodes::res<3>(gb, ByteRegister::E); },                              false, 4);
+X(res_3_H,      [](GameboyImpl &gb) { opcodes::res<3>(gb, ByteRegister::H); },                              false, 4);
+X(res_3_L,      [](GameboyImpl &gb) { opcodes::res<3>(gb, ByteRegister::L); },                              false, 4);
+X(res_3_pHL,    [](GameboyImpl &gb) { opcodes::res<3>(gb, byte_ptr(WordRegister::HL)); },                   false, 12);
+X(res_3_A,      [](GameboyImpl &gb) { opcodes::res<3>(gb, ByteRegister::A); },                              false, 4);
+
+/* 0xa0 - 0xaf */
+X(res_4_B,      [](GameboyImpl &gb) { opcodes::res<4>(gb, ByteRegister::B); },                              false, 4);
+X(res_4_C,      [](GameboyImpl &gb) { opcodes::res<4>(gb, ByteRegister::C); },                              false, 4);
+X(res_4_D,      [](GameboyImpl &gb) { opcodes::res<4>(gb, ByteRegister::D); },                              false, 4);
+X(res_4_E,      [](GameboyImpl &gb) { opcodes::res<4>(gb, ByteRegister::E); },                              false, 4);
+X(res_4_H,      [](GameboyImpl &gb) { opcodes::res<4>(gb, ByteRegister::H); },                              false, 4);
+X(res_4_L,      [](GameboyImpl &gb) { opcodes::res<4>(gb, ByteRegister::L); },                              false, 4);
+X(res_4_pHL,    [](GameboyImpl &gb) { opcodes::res<4>(gb, byte_ptr(WordRegister::HL)); },                   false, 12);
+X(res_4_A,      [](GameboyImpl &gb) { opcodes::res<4>(gb, ByteRegister::A); },                              false, 4);
+X(res_5_B,      [](GameboyImpl &gb) { opcodes::res<5>(gb, ByteRegister::B); },                              false, 4);
+X(res_5_C,      [](GameboyImpl &gb) { opcodes::res<5>(gb, ByteRegister::C); },                              false, 4);
+X(res_5_D,      [](GameboyImpl &gb) { opcodes::res<5>(gb, ByteRegister::D); },                              false, 4);
+X(res_5_E,      [](GameboyImpl &gb) { opcodes::res<5>(gb, ByteRegister::E); },                              false, 4);
+X(res_5_H,      [](GameboyImpl &gb) { opcodes::res<5>(gb, ByteRegister::H); },                              false, 4);
+X(res_5_L,      [](GameboyImpl &gb) { opcodes::res<5>(gb, ByteRegister::L); },                              false, 4);
+X(res_5_pHL,    [](GameboyImpl &gb) { opcodes::res<5>(gb, byte_ptr(WordRegister::HL)); },                   false, 12);
+X(res_5_A,      [](GameboyImpl &gb) { opcodes::res<5>(gb, ByteRegister::A); },                              false, 4);
+
+/* 0xb0 - 0xbf */
+X(res_6_B,      [](GameboyImpl &gb) { opcodes::res<6>(gb, ByteRegister::B); },                              false, 4);
+X(res_6_C,      [](GameboyImpl &gb) { opcodes::res<6>(gb, ByteRegister::C); },                              false, 4);
+X(res_6_D,      [](GameboyImpl &gb) { opcodes::res<6>(gb, ByteRegister::D); },                              false, 4);
+X(res_6_E,      [](GameboyImpl &gb) { opcodes::res<6>(gb, ByteRegister::E); },                              false, 4);
+X(res_6_H,      [](GameboyImpl &gb) { opcodes::res<6>(gb, ByteRegister::H); },                              false, 4);
+X(res_6_L,      [](GameboyImpl &gb) { opcodes::res<6>(gb, ByteRegister::L); },                              false, 4);
+X(res_6_pHL,    [](GameboyImpl &gb) { opcodes::res<6>(gb, byte_ptr(WordRegister::HL)); },                   false, 12);
+X(res_6_A,      [](GameboyImpl &gb) { opcodes::res<6>(gb, ByteRegister::A); },                              false, 4);
+X(res_7_B,      [](GameboyImpl &gb) { opcodes::res<7>(gb, ByteRegister::B); },                              false, 4);
+X(res_7_C,      [](GameboyImpl &gb) { opcodes::res<7>(gb, ByteRegister::C); },                              false, 4);
+X(res_7_D,      [](GameboyImpl &gb) { opcodes::res<7>(gb, ByteRegister::D); },                              false, 4);
+X(res_7_E,      [](GameboyImpl &gb) { opcodes::res<7>(gb, ByteRegister::E); },                              false, 4);
+X(res_7_H,      [](GameboyImpl &gb) { opcodes::res<7>(gb, ByteRegister::H); },                              false, 4);
+X(res_7_L,      [](GameboyImpl &gb) { opcodes::res<7>(gb, ByteRegister::L); },                              false, 4);
+X(res_7_pHL,    [](GameboyImpl &gb) { opcodes::res<7>(gb, byte_ptr(WordRegister::HL)); },                   false, 12);
+X(res_7_A,      [](GameboyImpl &gb) { opcodes::res<7>(gb, ByteRegister::A); },                              false, 4);
+
+/* 0xc0 - 0xcf */
+X(set_0_B,      [](GameboyImpl &gb) { opcodes::set<0>(gb, ByteRegister::B); },                              false, 4);
+X(set_0_C,      [](GameboyImpl &gb) { opcodes::set<0>(gb, ByteRegister::C); },                              false, 4);
+X(set_0_D,      [](GameboyImpl &gb) { opcodes::set<0>(gb, ByteRegister::D); },                              false, 4);
+X(set_0_E,      [](GameboyImpl &gb) { opcodes::set<0>(gb, ByteRegister::E); },                              false, 4);
+X(set_0_H,      [](GameboyImpl &gb) { opcodes::set<0>(gb, ByteRegister::H); },                              false, 4);
+X(set_0_L,      [](GameboyImpl &gb) { opcodes::set<0>(gb, ByteRegister::L); },                              false, 4);
+X(set_0_pHL,    [](GameboyImpl &gb) { opcodes::set<0>(gb, byte_ptr(WordRegister::HL)); },                   false, 12);
+X(set_0_A,      [](GameboyImpl &gb) { opcodes::set<0>(gb, ByteRegister::A); },                              false, 4);
+X(set_1_B,      [](GameboyImpl &gb) { opcodes::set<1>(gb, ByteRegister::B); },                              false, 4);
+X(set_1_C,      [](GameboyImpl &gb) { opcodes::set<1>(gb, ByteRegister::C); },                              false, 4);
+X(set_1_D,      [](GameboyImpl &gb) { opcodes::set<1>(gb, ByteRegister::D); },                              false, 4);
+X(set_1_E,      [](GameboyImpl &gb) { opcodes::set<1>(gb, ByteRegister::E); },                              false, 4);
+X(set_1_H,      [](GameboyImpl &gb) { opcodes::set<1>(gb, ByteRegister::H); },                              false, 4);
+X(set_1_L,      [](GameboyImpl &gb) { opcodes::set<1>(gb, ByteRegister::L); },                              false, 4);
+X(set_1_pHL,    [](GameboyImpl &gb) { opcodes::set<1>(gb, byte_ptr(WordRegister::HL)); },                   false, 12);
+X(set_1_A,      [](GameboyImpl &gb) { opcodes::set<1>(gb, ByteRegister::A); },                              false, 4);
+
+/* 0xd0 - 0xdf */
+X(set_2_B,      [](GameboyImpl &gb) { opcodes::set<2>(gb, ByteRegister::B); },                              false, 4);
+X(set_2_C,      [](GameboyImpl &gb) { opcodes::set<2>(gb, ByteRegister::C); },                              false, 4);
+X(set_2_D,      [](GameboyImpl &gb) { opcodes::set<2>(gb, ByteRegister::D); },                              false, 4);
+X(set_2_E,      [](GameboyImpl &gb) { opcodes::set<2>(gb, ByteRegister::E); },                              false, 4);
+X(set_2_H,      [](GameboyImpl &gb) { opcodes::set<2>(gb, ByteRegister::H); },                              false, 4);
+X(set_2_L,      [](GameboyImpl &gb) { opcodes::set<2>(gb, ByteRegister::L); },                              false, 4);
+X(set_2_pHL,    [](GameboyImpl &gb) { opcodes::set<2>(gb, byte_ptr(WordRegister::HL)); },                   false, 12);
+X(set_2_A,      [](GameboyImpl &gb) { opcodes::set<2>(gb, ByteRegister::A); },                              false, 4);
+X(set_3_B,      [](GameboyImpl &gb) { opcodes::set<3>(gb, ByteRegister::B); },                              false, 4);
+X(set_3_C,      [](GameboyImpl &gb) { opcodes::set<3>(gb, ByteRegister::C); },                              false, 4);
+X(set_3_D,      [](GameboyImpl &gb) { opcodes::set<3>(gb, ByteRegister::D); },                              false, 4);
+X(set_3_E,      [](GameboyImpl &gb) { opcodes::set<3>(gb, ByteRegister::E); },                              false, 4);
+X(set_3_H,      [](GameboyImpl &gb) { opcodes::set<3>(gb, ByteRegister::H); },                              false, 4);
+X(set_3_L,      [](GameboyImpl &gb) { opcodes::set<3>(gb, ByteRegister::L); },                              false, 4);
+X(set_3_pHL,    [](GameboyImpl &gb) { opcodes::set<3>(gb, byte_ptr(WordRegister::HL)); },                   false, 12);
+X(set_3_A,      [](GameboyImpl &gb) { opcodes::set<3>(gb, ByteRegister::A); },                              false, 4);
+
+/* 0xe0 - 0xef */
+X(set_4_B,      [](GameboyImpl &gb) { opcodes::set<4>(gb, ByteRegister::B); },                              false, 4);
+X(set_4_C,      [](GameboyImpl &gb) { opcodes::set<4>(gb, ByteRegister::C); },                              false, 4);
+X(set_4_D,      [](GameboyImpl &gb) { opcodes::set<4>(gb, ByteRegister::D); },                              false, 4);
+X(set_4_E,      [](GameboyImpl &gb) { opcodes::set<4>(gb, ByteRegister::E); },                              false, 4);
+X(set_4_H,      [](GameboyImpl &gb) { opcodes::set<4>(gb, ByteRegister::H); },                              false, 4);
+X(set_4_L,      [](GameboyImpl &gb) { opcodes::set<4>(gb, ByteRegister::L); },                              false, 4);
+X(set_4_pHL,    [](GameboyImpl &gb) { opcodes::set<4>(gb, byte_ptr(WordRegister::HL)); },                   false, 12);
+X(set_4_A,      [](GameboyImpl &gb) { opcodes::set<4>(gb, ByteRegister::A); },                              false, 4);
+X(set_5_B,      [](GameboyImpl &gb) { opcodes::set<5>(gb, ByteRegister::B); },                              false, 4);
+X(set_5_C,      [](GameboyImpl &gb) { opcodes::set<5>(gb, ByteRegister::C); },                              false, 4);
+X(set_5_D,      [](GameboyImpl &gb) { opcodes::set<5>(gb, ByteRegister::D); },                              false, 4);
+X(set_5_E,      [](GameboyImpl &gb) { opcodes::set<5>(gb, ByteRegister::E); },                              false, 4);
+X(set_5_H,      [](GameboyImpl &gb) { opcodes::set<5>(gb, ByteRegister::H); },                              false, 4);
+X(set_5_L,      [](GameboyImpl &gb) { opcodes::set<5>(gb, ByteRegister::L); },                              false, 4);
+X(set_5_pHL,    [](GameboyImpl &gb) { opcodes::set<5>(gb, byte_ptr(WordRegister::HL)); },                   false, 12);
+X(set_5_A,      [](GameboyImpl &gb) { opcodes::set<5>(gb, ByteRegister::A); },                              false, 4);
+
+/* 0xf0 - 0xff */
+X(set_6_B,      [](GameboyImpl &gb) { opcodes::set<6>(gb, ByteRegister::B); },                              false, 4);
+X(set_6_C,      [](GameboyImpl &gb) { opcodes::set<6>(gb, ByteRegister::C); },                              false, 4);
+X(set_6_D,      [](GameboyImpl &gb) { opcodes::set<6>(gb, ByteRegister::D); },                              false, 4);
+X(set_6_E,      [](GameboyImpl &gb) { opcodes::set<6>(gb, ByteRegister::E); },                              false, 4);
+X(set_6_H,      [](GameboyImpl &gb) { opcodes::set<6>(gb, ByteRegister::H); },                              false, 4);
+X(set_6_L,      [](GameboyImpl &gb) { opcodes::set<6>(gb, ByteRegister::L); },                              false, 4);
+X(set_6_pHL,    [](GameboyImpl &gb) { opcodes::set<6>(gb, byte_ptr(WordRegister::HL)); },                   false, 12);
+X(set_6_A,      [](GameboyImpl &gb) { opcodes::set<6>(gb, ByteRegister::A); },                              false, 4);
+X(set_7_B,      [](GameboyImpl &gb) { opcodes::set<7>(gb, ByteRegister::B); },                              false, 4);
+X(set_7_C,      [](GameboyImpl &gb) { opcodes::set<7>(gb, ByteRegister::C); },                              false, 4);
+X(set_7_D,      [](GameboyImpl &gb) { opcodes::set<7>(gb, ByteRegister::D); },                              false, 4);
+X(set_7_E,      [](GameboyImpl &gb) { opcodes::set<7>(gb, ByteRegister::E); },                              false, 4);
+X(set_7_H,      [](GameboyImpl &gb) { opcodes::set<7>(gb, ByteRegister::H); },                              false, 4);
+X(set_7_L,      [](GameboyImpl &gb) { opcodes::set<7>(gb, ByteRegister::L); },                              false, 4);
+X(set_7_pHL,    [](GameboyImpl &gb) { opcodes::set<7>(gb, byte_ptr(WordRegister::HL)); },                   false, 12);
+X(set_7_A,      [](GameboyImpl &gb) { opcodes::set<7>(gb, ByteRegister::A); },                              false, 4);
+
