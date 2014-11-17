@@ -43,7 +43,12 @@ set_target_properties(opcodes
     LINKER_LANGUAGE C
 )
 
-include_directories(./include)
+find_package(LLVM 3.4 REQUIRED all)
+
+include_directories(
+    ${LLVM_INCLUDE_DIRS},
+    ./include
+)
 add_library(libmjkgb
     ./include/mjkgb.hpp
 
@@ -55,6 +60,14 @@ add_library(libmjkgb
     ./src/gameboy.cpp
     ./src/opcodes.cpp
 )
-target_link_libraries(libmjkgb opcodes)
-set_target_properties(libmjkgb PROPERTIES PREFIX "")
+target_link_libraries(libmjkgb
+    opcodes
+    ${LLVM_LIBRARIES}
+)
+set_target_properties(libmjkgb PROPERTIES
+    PREFIX ""
+    LINKER_LANGUAGE CXX
+    COMPILE_FLAGS ${LLVM_CXXFLAGS}
+    LINK_FLAGS ${LLVM_LDFLAGS}
+)
 
