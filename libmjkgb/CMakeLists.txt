@@ -58,6 +58,7 @@ add_library(libmjkgb
     ./src/spsc_queue.hpp
 
     ./src/gameboy.cpp
+    ./src/mmu.cpp
     ./src/opcodes.cpp
 )
 target_link_libraries(libmjkgb

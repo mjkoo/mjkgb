@@ -41,31 +41,6 @@ struct GameboyImpl {
         cpu_.tick();
     }
 
-    inline void stop()
-    {
-        cpu_.stop();
-    }
-
-    inline bool stopped() const
-    {
-        return cpu_.stopped();
-    }
-
-    inline void halt()
-    {
-        cpu_.halt();
-    }
-
-    inline void enable_interrupts()
-    {
-        cpu_.enable_interrupts();
-    }
-
-    inline void disable_interrupts()
-    {
-        cpu_.disable_interrupts();
-    }
-
     inline void load(std::istream &is)
     {
         mmu_.load(is);
@@ -178,7 +153,7 @@ struct accessor<Constant<value>> {
         return value;
     }
 
-    void set(GameboyImpl &gb, Constant<value>) const;
+    void set(GameboyImpl &gb, Constant<value>, value_type) const;
 };
 
 template<typename T>

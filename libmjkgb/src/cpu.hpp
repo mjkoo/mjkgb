@@ -17,23 +17,23 @@ public:
         registers_()
     { }
 
-    uint8_t get(ByteRegister reg) const
+    inline uint8_t get(ByteRegister reg) const
     {
         return registers_[static_cast<size_t>(reg)];
     }
 
-    uint16_t get(WordRegister reg) const
+    inline uint16_t get(WordRegister reg) const
     {
         auto index = 2 * static_cast<size_t>(reg);
         return static_cast<uint16_t>(registers_[index] << 8 | registers_[index + 1]);
     }
 
-    void set(ByteRegister reg, uint8_t value)
+    inline void set(ByteRegister reg, uint8_t value)
     {
         registers_[static_cast<size_t>(reg)] = value;
     }
 
-    void set(WordRegister reg, uint16_t value, bool tick = true)
+    inline void set(WordRegister reg, uint16_t value, bool tick = true)
     {
         auto index = 2 * static_cast<size_t>(reg);
         registers_[index] = (value >> 8) & 0xff;
@@ -42,37 +42,42 @@ public:
         registers_[index + 1] = value & 0xff;
     }
 
-    void tick()
+    inline void tick()
     {
         clock_++;
     }
 
-    void stop()
+    inline void stop()
     {
         stopped_ = true;
     }
 
-    bool stopped() const
+    inline void run()
+    {
+        stopped_ = false;
+    }
+
+    inline bool stopped() const
     {
         return stopped_;
     }
 
-    void halt()
+    inline void halt()
     {
 
     }
 
-    void disable_interrupts()
+    inline void disable_interrupts()
     {
         interrupt_flag_ = false;
     }
 
-    void enable_interrupts()
+    inline void enable_interrupts()
     {
         interrupt_flag_ = true;
     }
 
-    bool interrupt_flag() const
+    inline bool interrupt_flag() const
     {
         return interrupt_flag_;
     }

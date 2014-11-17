@@ -22,22 +22,22 @@ void undefined(GameboyImpl &gb)
 
 void stop(GameboyImpl &gb)
 {
-    gb.stop();
+    gb.cpu_.stop();
 }
 
 void halt(GameboyImpl &gb)
 {
-    gb.halt();
+    gb.cpu_.halt();
 }
 
 void ei(GameboyImpl &gb)
 {
-    gb.enable_interrupts();
+    gb.cpu_.enable_interrupts();
 }
 
 void di(GameboyImpl &gb)
 {
-    gb.disable_interrupts();
+    gb.cpu_.disable_interrupts();
 }
 
 template<typename Dst, typename Src>
@@ -453,10 +453,12 @@ void GameboyImpl::run()
 #undef X
     };
 #define DISPATCH() do {                                     \
-    if (stopped()) return;                               \
+    if (cpu_.stopped()) return;                               \
     opcode = get(ByteImmediate{});                          \
     goto *dispatch_table[opcode];                           \
 } while (false);
+
+    cpu_.run();
 
     DISPATCH();
     while (true) {
