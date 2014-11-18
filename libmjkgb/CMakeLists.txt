@@ -66,6 +66,7 @@ add_library(libmjkgb
     ./src/mmu.cpp
     ./src/opcodes.cpp
 )
+llvm_map_components_to_libnames(LLVM_LIBRARIES all)
 target_link_libraries(libmjkgb
     opcodes
     ${LLVM_LIBRARIES}

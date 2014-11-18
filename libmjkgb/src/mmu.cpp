@@ -6,6 +6,11 @@ namespace mjkgb {
 
 using namespace std;
 
+void Mmu::set_native(uint16_t address, uintptr_t func)
+{
+    native_[address].store(func);
+}
+
 void Mmu::load(istream &is)
 {
     memory_.fill(0);

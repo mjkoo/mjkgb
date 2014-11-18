@@ -6,6 +6,7 @@
 #include <string>
 
 #include "mjkgb.hpp"
+#include "compiler.hpp"
 #include "cpu.hpp"
 #include "mmu.hpp"
 #include "operands.hpp"
@@ -21,7 +22,8 @@ template<typename T> struct accessor;
 struct GameboyImpl {
     GameboyImpl()
       : cpu_(),
-        mmu_()
+        mmu_(),
+        compiler_()
     { }
 
     template<typename T>
@@ -48,7 +50,7 @@ struct GameboyImpl {
 
     inline void jump(uint16_t address, bool tick = true)
     {
-        auto native = mmu_.native(address);
+        auto native = reinterpret_cast<void(*)(GameboyImpl &)>(mmu_.get_native(address));
         cpu_.set(WordRegister::PC, address, tick);
         if (native)
             native(*this);
@@ -58,6 +60,7 @@ struct GameboyImpl {
 
     Cpu cpu_;
     Mmu mmu_;
+    Compiler compiler_;
 
     template<typename T> friend struct accessor;
 };

@@ -1,27 +1,21 @@
 #ifndef COMPILER_HPP_
 #define COMPILER_HPP_
 
-#include <cstdint>
-#include <functional>
 #include <memory>
 #include <vector>
 
-#include <llvm/IR/Module.h>
-
 namespace mjkgb {
-
-using namespace llvm;
-
-struct GameboyImpl;
 
 class Compiler {
 public:
     Compiler();
-    
-    std::function<void(GameboyImpl &)> compile_basic_block(const std::vector<uint8_t> &bb);
+    ~Compiler();
+
+    void *compile(uint16_t address, const std::vector<uint8_t> &block);
 
 private:
-    std::unique_ptr<llvm::Module> module_;
+    class impl;
+    std::unique_ptr<impl> pimpl_;
 };
 
 }

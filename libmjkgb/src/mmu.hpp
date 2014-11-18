@@ -2,8 +2,8 @@
 #define MMU_HPP_
 
 #include <array>
+#include <atomic>
 #include <cstdint>
-#include <functional>
 #include <iosfwd>
 #include <string>
 
@@ -28,10 +28,12 @@ public:
         memory_[address] = value;
     }
 
-    inline std::function<void(GameboyImpl &)> native(uint16_t address)
+    inline uintptr_t get_native(uint16_t address)
     {
-        return native_[address];
+        return native_[address].load();
     }
+
+    void set_native(uint16_t address, uintptr_t func);
 
     void load(std::istream &is);
 
@@ -39,8 +41,7 @@ private:
     static constexpr int memory_size = 1 << 16;
 
     std::array<uint8_t, memory_size> memory_;
-    std::array<std::function<void(GameboyImpl &)>, memory_size> native_;
-
+    std::array<std::atomic_uintptr_t, memory_size> native_;
 };
 
 }

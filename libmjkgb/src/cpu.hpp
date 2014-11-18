@@ -59,7 +59,7 @@ public:
         stopped_ = true;
     }
 
-    inline bool stopped() const
+    inline bool is_stopped() const
     {
         return stopped_;
     }

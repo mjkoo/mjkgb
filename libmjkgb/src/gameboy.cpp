@@ -19,7 +19,8 @@ Gameboy::Gameboy(const string &filename)
     load(filename);
 }
 
-Gameboy::~Gameboy() = default;
+Gameboy::~Gameboy()
+{ }
 
 void Gameboy::load(const string &filename)
 {
