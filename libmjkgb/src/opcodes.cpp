@@ -389,12 +389,12 @@ template<ConditionCode cc, typename Op>
 void jp(GameboyImpl &gb, Op op)
 {
     if (gb.get(cc))
-        ld(gb, WordRegister::PC, op);
+        gb.jump(gb.get(op));
 }
 
 void jp_hl(GameboyImpl &gb)
 {
-    gb.cpu_.set(WordRegister::PC, gb.get(WordRegister::HL), false);
+    gb.jump(gb.get(WordRegister::HL), false);
 }
 
 template<ConditionCode cc>
@@ -402,7 +402,7 @@ void jr(GameboyImpl &gb)
 {
     auto disp = static_cast<int8_t>(gb.get(ByteImmediate{}));
     if (gb.get(cc))
-        gb.set(WordRegister::PC, static_cast<uint16_t>(gb.get(WordRegister::PC) + disp));
+        gb.jump(gb.get(WordRegister::PC) + disp);
 }
 
 template<ConditionCode cc, typename Op>
@@ -411,8 +411,8 @@ void call(GameboyImpl &gb, Op op)
     auto dest = gb.get(op);
     if (gb.get(cc)) {
         gb.set(word_ptr<0, 2>(WordRegister::SP), gb.get(WordRegister::PC));
-        gb.cpu_.set(WordRegister::PC, static_cast<uint16_t>(dest), false);
         gb.set(WordRegister::SP, gb.get(WordRegister::SP) - 2);
+        gb.jump(dest, false);
     }
 }
 
@@ -428,8 +428,11 @@ void ret(GameboyImpl &gb)
     if (cc != ConditionCode::UNCONDITIONAL)
         gb.cpu_.tick();
 
+    if (enable_interrupts)
+        gb.cpu_.enable_interrupts();
+
     if (gb.get(cc))
-        gb.set(WordRegister::PC, gb.get(word_ptr<2>(WordRegister::SP)));
+        gb.jump(gb.get(word_ptr<2>(WordRegister::SP)));
 }
 
 void cb_prefix(GameboyImpl &);

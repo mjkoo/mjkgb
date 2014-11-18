@@ -46,6 +46,11 @@ struct GameboyImpl {
         mmu_.load(is);
     }
 
+    inline void jump(uint16_t address, bool tick = true)
+    {
+        cpu_.set(WordRegister::PC, address, tick);
+    }
+
     void run();
 
     Cpu cpu_;
