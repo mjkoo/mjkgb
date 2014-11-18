@@ -9,10 +9,12 @@ set(CMAKE_MODULE_PATH
 
 include(EnableCXX11)
 
+# Turn off a lot of warnings, some are overly pedantic, some are valid but flag LLVM code
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     set(EXTRA_CXX_FLAGS
         "-Werror"
         "-Weverything"
+        "-Wno-conversion"
         "-Wno-padded"
         "-Wno-shadow"
         "-Wno-unused-function"
@@ -23,8 +25,13 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         "-Wno-global-constructors"
         "-Wno-missing-noreturn"
         "-Wno-missing-prototypes"
+        "-Wno-shorten-64-to-32"
+        "-Wno-switch-enum"
         "-Wno-c++11-extensions"
         "-Wno-c++98-compat"
+        "-Wno-c++98-compat-pedantic"
+        "-Wno-shift-sign-overflow"
+        "-Wno-sign-conversion"
         "-Wno-gnu-label-as-value")
     foreach(flag ${EXTRA_CXX_FLAGS})
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${flag}")

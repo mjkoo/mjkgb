@@ -109,7 +109,7 @@ struct accessor<ConditionCode> {
         case ConditionCode::N:
         case ConditionCode::H:
         case ConditionCode::C:
-            flag_index = 3 - static_cast<int>(cc) + 4;
+            flag_index = 3 - static_cast<size_t>(cc) + 4;
             break;
         case ConditionCode::NZ:
             flag_index = 7;
@@ -130,10 +130,10 @@ struct accessor<ConditionCode> {
 
     void set(GameboyImpl &gb, ConditionCode cc, value_type value) const
     {
-        if (static_cast<int>(cc) >= 4) return;
+        if (static_cast<size_t>(cc) >= 4) return;
         
         auto flags = gb.cpu_.get(ByteRegister::F);
-        auto mask = 1 << ((3 - static_cast<int>(cc)) + 4);
+        auto mask = 1 << ((3 - static_cast<size_t>(cc)) + 4);
 
         if (value)
             flags |= mask;
@@ -213,7 +213,7 @@ struct accessor<WordPointer<T, inc, off>> {
         address |= gb.get(ptr.value);
         address += off;
 
-        auto ret = static_cast<value_type>(gb.mmu_.get(address));
+        auto ret = value_type{gb.mmu_.get(address)};
         gb.tick();
         ret |= (gb.mmu_.get(address + 1) << 8);
         gb.tick();

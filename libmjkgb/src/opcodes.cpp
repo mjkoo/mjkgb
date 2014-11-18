@@ -54,7 +54,7 @@ void ld_hl_sp_n(GameboyImpl &gb)
 
 void push(GameboyImpl &gb, WordRegister reg)
 {
-    ld(gb, word_ptr<-2>(WordRegister::SP), reg);
+    ld(gb, word_ptr<-2, -2>(WordRegister::SP), reg);
 }
 
 void pop(GameboyImpl &gb, WordRegister reg)

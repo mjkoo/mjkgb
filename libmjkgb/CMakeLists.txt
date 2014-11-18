@@ -52,11 +52,13 @@ include_directories(
 add_library(libmjkgb
     ./include/mjkgb.hpp
 
+    ./src/compiler.hpp
     ./src/cpu.hpp
     ./src/mmu.hpp
     ./src/operands.hpp
     ./src/spsc_queue.hpp
 
+    ./src/compiler.cpp
     ./src/gameboy.cpp
     ./src/mmu.cpp
     ./src/opcodes.cpp
