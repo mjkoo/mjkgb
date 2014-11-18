@@ -211,7 +211,8 @@ struct accessor<BytePointer<T, inc, off>> {
 
         if (inc)
             gb.set(ptr.value, static_cast<operand_type>(gb.get(ptr.value) + inc));
-    } };
+    }
+};
 
 template<typename T, int inc, int off>
 struct accessor<WordPointer<T, inc, off>> {
