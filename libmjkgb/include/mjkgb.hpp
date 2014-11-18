@@ -17,7 +17,7 @@ public:
     explicit Gameboy(const std::string &filename);
     ~Gameboy();
 
-    typedef std::function<void(const std::array<uint8_t, 3 * xres * yres> &)> vsync_cb;
+    using vsync_cb = std::function<void(const std::array<uint8_t, 3 * xres * yres> &)>;
     void setVsyncCallback(vsync_cb callback);
 
     void load(const std::string &filename);

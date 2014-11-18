@@ -2,6 +2,7 @@
 #define COMPILER_HPP_
 
 #include <cstdint>
+#include <functional>
 #include <memory>
 #include <vector>
 
@@ -11,15 +12,13 @@ namespace mjkgb {
 
 using namespace llvm;
 
-class GameboyImpl;
+struct GameboyImpl;
 
 class Compiler {
 public:
-    using opcode_type = void (*)(GameboyImpl &);
-
     Compiler();
     
-    opcode_type compile_basic_block(const std::vector<uint8_t> &bb);
+    std::function<void(GameboyImpl &)> compile_basic_block(const std::vector<uint8_t> &bb);
 
 private:
     std::unique_ptr<llvm::Module> module_;

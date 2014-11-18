@@ -48,7 +48,10 @@ struct GameboyImpl {
 
     inline void jump(uint16_t address, bool tick = true)
     {
+        auto native = mmu_.native(address);
         cpu_.set(WordRegister::PC, address, tick);
+        if (native)
+            native(*this);
     }
 
     void run();

@@ -114,28 +114,28 @@ void sbc(GameboyImpl &gb, Dst dst, Src src)
 }
 
 template<typename Op>
-typename enable_if<!is_same<Op, WordRegister>::value, void>::type
-inc(GameboyImpl &gb, Op op)
+void inc(GameboyImpl &gb, Op op)
 {
     auto carry_flag = gb.get(ConditionCode::C);
     add(gb, op, Constant<1>());
     gb.set(ConditionCode::C, carry_flag);
 }
 
+template<>
 void inc(GameboyImpl &gb, WordRegister op)
 {
     gb.set(op, gb.get(op) + 1);
 }
 
 template<typename Op>
-typename enable_if<!is_same<Op, WordRegister>::value, void>::type
-dec(GameboyImpl &gb, Op op)
+void dec(GameboyImpl &gb, Op op)
 {
     auto carry_flag = gb.get(ConditionCode::C);
     sub(gb, op, Constant<1>());
     gb.set(ConditionCode::C, carry_flag);
 }
 
+template<>
 void dec(GameboyImpl &gb, WordRegister op)
 {
     gb.set(op, gb.get(op) - 1);

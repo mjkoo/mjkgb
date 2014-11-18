@@ -25,7 +25,7 @@ Compiler::Compiler()
 //    module_ = parseBitcodeFile(buffer);
 }
 
-Compiler::opcode_type Compiler::compile_basic_block(const vector<uint8_t> &bb)
+function<void(GameboyImpl &)> Compiler::compile_basic_block(const vector<uint8_t> &bb)
 {
     return nullptr;
 }

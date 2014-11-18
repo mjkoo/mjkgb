@@ -9,6 +9,10 @@ set(CMAKE_MODULE_PATH
 
 include(EnableCXX11)
 
+if (NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build" FORCE)
+endif()
+
 # Turn off a lot of warnings, some are overly pedantic, some are valid but flag LLVM code
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     set(EXTRA_CXX_FLAGS

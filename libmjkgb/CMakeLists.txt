@@ -43,11 +43,14 @@ set_target_properties(opcodes
     LINKER_LANGUAGE C
 )
 
-find_package(LLVM 3.4 REQUIRED all)
+find_package(LLVM REQUIRED CONFIG)
 
 include_directories(
     ${LLVM_INCLUDE_DIRS},
     ./include
+)
+add_definitions(
+    ${LLVM_DEFINITIONS}
 )
 add_library(libmjkgb
     ./include/mjkgb.hpp
@@ -67,10 +70,5 @@ target_link_libraries(libmjkgb
     opcodes
     ${LLVM_LIBRARIES}
 )
-set_target_properties(libmjkgb PROPERTIES
-    PREFIX ""
-    LINKER_LANGUAGE CXX
-    COMPILE_FLAGS ${LLVM_CXXFLAGS}
-    LINK_FLAGS ${LLVM_LDFLAGS}
-)
+set_target_properties(libmjkgb PROPERTIES PREFIX "")
 
