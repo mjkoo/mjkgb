@@ -453,7 +453,7 @@ void GameboyImpl::run()
 #undef X
     };
 #define DISPATCH() do {                                     \
-    if (cpu_.stopped()) return;                               \
+    if (cpu_.stopped()) return;                             \
     opcode = get(ByteImmediate{});                          \
     goto *dispatch_table[opcode];                           \
 } while (false);
