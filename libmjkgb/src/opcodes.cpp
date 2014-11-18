@@ -458,7 +458,7 @@ void GameboyImpl::run()
     goto *dispatch_table[opcode];                           \
 } while (false);
 
-    cpu_.run();
+    cpu_.reset();
 
     DISPATCH();
     while (true) {

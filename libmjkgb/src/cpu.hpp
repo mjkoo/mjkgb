@@ -42,6 +42,13 @@ public:
         registers_[index + 1] = value & 0xff;
     }
 
+    inline void reset()
+    {
+        stopped_ = false;
+        interrupt_flag_ = true;
+        clock_ = 0;
+    }
+
     inline void tick()
     {
         clock_++;
@@ -50,11 +57,6 @@ public:
     inline void stop()
     {
         stopped_ = true;
-    }
-
-    inline void run()
-    {
-        stopped_ = false;
     }
 
     inline bool stopped() const
