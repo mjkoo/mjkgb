@@ -4,6 +4,9 @@
 #include <array>
 #include <cstdint>
 
+// Temp
+#include <iostream>
+
 #include "operands.hpp"
 
 namespace mjkgb {
@@ -52,6 +55,13 @@ public:
     inline void tick()
     {
         clock_++;
+        if (clock_ % 240 == 0)
+            std::cout << "VSYNC!" << std::endl;
+    }
+
+    inline unsigned long get_clock() const
+    {
+        return clock_;
     }
 
     inline void stop()

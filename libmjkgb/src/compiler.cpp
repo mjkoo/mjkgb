@@ -3,25 +3,31 @@
 #include <memory>
 #include <vector>
 
+#include <llvm/LinkAllIR.h>
+#include <llvm/LinkAllPasses.h>
 #include <llvm/ADT/StringRef.h>
 #include <llvm/Bitcode/ReaderWriter.h>
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
 #include <llvm/ExecutionEngine/JIT.h>
 #include <llvm/IR/BasicBlock.h>
+#include <llvm/IR/DataLayout.h>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/DerivedTypes.h>
 #include <llvm/IR/Function.h>
 #include <llvm/IR/Module.h>
+#include <llvm/IR/LegacyPassManager.h>
 #include <llvm/IR/Type.h>
 #include <llvm/Support/ErrorOr.h>
 #include <llvm/Support/MemoryBuffer.h>
+#include <llvm/Transforms/IPO.h>
 
 #include "compiler.hpp"
 
 namespace {
 
 using namespace llvm;
+using namespace llvm::legacy;
 
 extern "C" const char _binary_opcodes_bc_start[];
 extern "C" const char _binary_opcodes_bc_end[];
@@ -44,6 +50,14 @@ public:
         gb_type_ptr = PointerType::getUnqual(gb_type);
         opcode_type= FunctionType::get(Type::getVoidTy(getGlobalContext()), { gb_type_ptr }, false);
 
+        pm.add(createVerifierPass());
+        pm.add(createCFGSimplificationPass());
+        pm.add(createPromoteMemoryToRegisterPass());
+        pm.add(createGlobalOptimizerPass());
+        pm.add(createGlobalDCEPass());
+        pm.add(createFunctionInliningPass());
+        pm.add(createStripSymbolsPass());
+
         opcodes = {
 #define X(name, def, is_jump, cycles) mod->getFunction(#name),
 #include "opcode_map.in"
@@ -60,6 +74,7 @@ public:
 
     Module *mod;
     ExecutionEngine *ee;
+    PassManager pm;
     Type *gb_type;
     Type *gb_type_ptr;
     FunctionType *opcode_type;
@@ -81,7 +96,7 @@ public:
         auto func = Function::Create(JitContext::instance().opcode_type, Function::ExternalLinkage,
                 name, JitContext::instance().mod);
 
-        Value *gb = func->arg_begin();
+        auto gb = static_cast<Value *>(func->arg_begin());
         gb ->setName("gb");
 
         auto entry = BasicBlock::Create(getGlobalContext(), "entry", func);
@@ -93,6 +108,9 @@ public:
         builder.CreateRetVoid();
 
         func->dump();
+        JitContext::instance().pm.run(*JitContext::instance().mod);
+        func->dump();
+
         return JitContext::instance().ee->getPointerToFunction(func);
     }
 };

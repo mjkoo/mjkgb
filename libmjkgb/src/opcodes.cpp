@@ -508,7 +508,9 @@ extern "C" {
 __attribute__((used))                                       \
 void name(GameboyImpl &gb)                                  \
 {                                                           \
+    if (gb.cpu_.is_stopped()) return;                       \
     def(gb);                                                \
+    gb.tick();                                              \
 }
 #include "opcode_map.in"
 #include "cb_opcode_map.in"
