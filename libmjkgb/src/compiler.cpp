@@ -24,98 +24,89 @@
 
 #include "compiler.hpp"
 
-namespace {
+namespace mjkgb {
 
+using namespace std;
 using namespace llvm;
 using namespace llvm::legacy;
 
 extern "C" const char _binary_opcodes_bc_start[];
 extern "C" const char _binary_opcodes_bc_end[];
 
-/* This causes issues for an unknown reason when performed multiple times, so
- * make this a singleton and do it once at static initialization time. Need to
- * look into this.
- */
-class JitContext {
+
+class Compiler::impl {
 public:
-    JitContext()
+    impl()
+      : opcodes_(),
+        context_(),
+        pm_(),
+        mod_(nullptr),
+        ee_(nullptr),
+        gb_type_(nullptr),
+        gb_type_ptr_(nullptr),
+        opcode_type_(nullptr)
     {
         LLVMInitializeNativeTarget();
         size_t size = _binary_opcodes_bc_end - _binary_opcodes_bc_start;
         auto buffer = MemoryBuffer::getMemBuffer(StringRef{_binary_opcodes_bc_start, size}, "", false);
-        mod = parseBitcodeFile(buffer, getGlobalContext()).get();
-        ee = EngineBuilder(mod).create();
 
-        gb_type = mod->getTypeByName("struct.mjkgb::GameboyImpl");
-        gb_type_ptr = PointerType::getUnqual(gb_type);
-        opcode_type= FunctionType::get(Type::getVoidTy(getGlobalContext()), { gb_type_ptr }, false);
+        mod_ = parseBitcodeFile(buffer, context_).get();
+        ee_ = EngineBuilder(mod_).create();
 
-        pm.add(createVerifierPass());
-        pm.add(createCFGSimplificationPass());
-        pm.add(createPromoteMemoryToRegisterPass());
-        pm.add(createGlobalOptimizerPass());
-        pm.add(createGlobalDCEPass());
-        pm.add(createFunctionInliningPass());
-        pm.add(createStripSymbolsPass());
+        gb_type_ = mod_->getTypeByName("struct.mjkgb::GameboyImpl");
+        gb_type_ptr_ = PointerType::getUnqual(gb_type_);
+        opcode_type_= FunctionType::get(Type::getVoidTy(context_), { gb_type_ptr_ }, false);
 
-        opcodes = {
-#define X(name, def, is_jump, cycles) mod->getFunction(#name),
+        pm_.add(createVerifierPass());
+        pm_.add(createCFGSimplificationPass());
+        pm_.add(createPromoteMemoryToRegisterPass());
+        pm_.add(createGlobalOptimizerPass());
+        pm_.add(createGlobalDCEPass());
+        pm_.add(createFunctionInliningPass());
+        pm_.add(createStripSymbolsPass());
+
+        opcodes_ = {
+#define X(name, def, is_jump, cycles) mod_->getFunction(#name),
 #include "opcode_map.in"
 #include "cb_opcode_map.in"
 #undef X
         };
     }
 
-    static JitContext &instance()
+    uintptr_t compile(uint16_t address, const std::vector<uint8_t> &block)
     {
-        static JitContext instance;
-        return instance;
-    }
-
-    Module *mod;
-    ExecutionEngine *ee;
-    PassManager pm;
-    Type *gb_type;
-    Type *gb_type_ptr;
-    FunctionType *opcode_type;
-    std::array<Function *, 512> opcodes;
-};
-
-}
-
-namespace mjkgb {
-
-using namespace std;
-using namespace llvm;
-
-class Compiler::impl {
-public:
-    void *compile(uint16_t address, const std::vector<uint8_t> &block)
-    {
-        auto name = to_string(address);
-        auto func = Function::Create(JitContext::instance().opcode_type, Function::ExternalLinkage,
-                name, JitContext::instance().mod);
+        auto name = "jit_" + to_string(address);
+        auto func = Function::Create(opcode_type_, Function::ExternalLinkage, name, mod_);
 
         auto gb = static_cast<Value *>(func->arg_begin());
         gb->setName("gb");
 
-        auto entry = BasicBlock::Create(getGlobalContext(), "entry", func);
+        auto entry = BasicBlock::Create(context_, "entry", func);
         auto builder = IRBuilder<>{entry};
 
         auto is_cb = false;
         for (const auto &op : block) {
-            builder.CreateCall(JitContext::instance().opcodes[op + (is_cb ? 256 : 0)], gb);
+            builder.CreateCall(opcodes_[op + (is_cb ? 256 : 0)], gb);
             is_cb = op == 0xcb;
         }
 
         builder.CreateRetVoid();
 
-        func->dump();
-        JitContext::instance().pm.run(*JitContext::instance().mod);
-        func->dump();
+        pm_.run(*mod_);
 
-        return JitContext::instance().ee->getPointerToFunction(func);
+        return reinterpret_cast<uintptr_t>(ee_->getPointerToFunction(func));
     }
+
+private:
+    std::array<Function *, 512> opcodes_;
+
+    LLVMContext context_;
+    PassManager pm_;
+    Module *mod_;
+    ExecutionEngine *ee_;
+    Type *gb_type_;
+    Type *gb_type_ptr_;
+    FunctionType *opcode_type_;
 };
 
 Compiler::Compiler()
@@ -125,7 +116,7 @@ Compiler::Compiler()
 Compiler::~Compiler()
 { }
 
-void *Compiler::compile(uint16_t address, const std::vector<uint8_t> &block)
+uintptr_t Compiler::compile(uint16_t address, const std::vector<uint8_t> &block)
 {
     return pimpl_->compile(address, block);
 }

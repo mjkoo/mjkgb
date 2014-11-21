@@ -11,7 +11,7 @@ public:
     Compiler();
     ~Compiler();
 
-    void *compile(uint16_t address, const std::vector<uint8_t> &block);
+    uintptr_t compile(uint16_t address, const std::vector<uint8_t> &block);
 
 private:
     class impl;
