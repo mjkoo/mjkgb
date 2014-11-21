@@ -102,8 +102,11 @@ public:
         auto entry = BasicBlock::Create(getGlobalContext(), "entry", func);
         auto builder = IRBuilder<>{entry};
 
-        for (const auto &op : block)
-            builder.CreateCall(JitContext::instance().opcodes[op], gb);
+        bool is_cb = false;
+        for (const auto &op : block) {
+            builder.CreateCall(JitContext::instance().opcodes[op + (is_cb ? 256 : 0)], gb);
+            is_cb = op == 0xcb;
+        }
 
         builder.CreateRetVoid();
 

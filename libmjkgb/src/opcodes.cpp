@@ -456,7 +456,7 @@ void GameboyImpl::run()
 #undef X
     };
 #define DISPATCH() do {                                     \
-    if (cpu_.is_stopped()) return;                             \
+    if (cpu_.is_stopped()) return;                          \
     opcode = get(ByteImmediate{});                          \
     goto *dispatch_table[opcode];                           \
 } while (false);
@@ -503,6 +503,17 @@ void cb_prefix(GameboyImpl &gb)
 
 #else
 
+namespace opcodes {
+namespace {
+
+void cb_prefix(GameboyImpl &gb)
+{
+    gb.tick();
+}
+
+}
+}
+
 extern "C" {
 #define X(name, def, is_jump, cycles)                       \
 __attribute__((used))                                       \
@@ -515,15 +526,6 @@ void name(GameboyImpl &gb)                                  \
 #include "opcode_map.in"
 #include "cb_opcode_map.in"
 #undef X
-}
-
-namespace opcodes {
-namespace {
-
-void cb_prefix(GameboyImpl &)
-{ }
-
-}
 }
 
 #endif
