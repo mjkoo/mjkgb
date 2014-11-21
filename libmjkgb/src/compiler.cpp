@@ -97,12 +97,12 @@ public:
                 name, JitContext::instance().mod);
 
         auto gb = static_cast<Value *>(func->arg_begin());
-        gb ->setName("gb");
+        gb->setName("gb");
 
         auto entry = BasicBlock::Create(getGlobalContext(), "entry", func);
         auto builder = IRBuilder<>{entry};
 
-        bool is_cb = false;
+        auto is_cb = false;
         for (const auto &op : block) {
             builder.CreateCall(JitContext::instance().opcodes[op + (is_cb ? 256 : 0)], gb);
             is_cb = op == 0xcb;
