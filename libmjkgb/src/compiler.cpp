@@ -33,7 +33,6 @@ using namespace llvm::legacy;
 extern "C" const char _binary_opcodes_bc_start[];
 extern "C" const char _binary_opcodes_bc_end[];
 
-
 class Compiler::impl {
 public:
     impl()

@@ -437,8 +437,8 @@ void ret(GameboyImpl &gb)
 
 void cb_prefix(GameboyImpl &);
 
-} /* anonymous namespace */
-} /* namespace opcodes */
+}
+}
 
 #ifndef EMIT_LLVM
 
@@ -498,8 +498,8 @@ void cb_prefix(GameboyImpl &gb)
 #undef X
 }
 
-} /* anonymous namespace */
-} /* namespace opcodes */
+}
+}
 
 #else
 
@@ -527,6 +527,7 @@ void name(GameboyImpl &gb)                                  \
 #include "cb_opcode_map.in"
 #undef X
 }
+
 
 #endif
 
